@@ -63,7 +63,11 @@ p{margin:0}
 section{margin-top:28px}
 .notice{margin-top:12px;padding:10px 12px;border-radius:10px;background:var(--warn-soft);color:var(--ink);font-size:14px;border:1px solid var(--line)}
 .notice strong{color:var(--warn)}
-.passage{font-family:var(--font-display);font-size:18px;line-height:2.15;display:grid;gap:12px}
+.passage{font-family:var(--font-display);font-size:18px;line-height:2.5;display:grid;gap:12px}
+.passage rt{font-family:var(--font-body);font-size:.5em;color:var(--muted);letter-spacing:0}
+.passage.noruby rt{visibility:hidden}
+.phead{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px}
+.phead h2{margin:0}
 .secs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
 .sec{font:inherit;font-size:13.5px;line-height:1.3;padding:7px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;display:inline-flex;gap:6px;align-items:center}
 .sec .n{font-family:var(--font-display);color:var(--accent)}
@@ -170,7 +174,7 @@ form.add{margin-top:14px;display:grid;gap:10px;grid-template-columns:repeat(auto
 
 <main>
   <section aria-labelledby="h-text">
-    <h2 id="h-text">本文</h2>
+    <div class="phead"><h2 id="h-text">本文</h2><button type="button" class="btn small" id="ruby-btn" data-act="ruby" aria-pressed="true">ルビを隠す</button></div>
     <div id="secs" class="secs" aria-label="段を選ぶ"></div>
     <div id="passage" class="passage"></div>
     <div id="sec-nav" class="sec-nav"></div>
@@ -181,6 +185,7 @@ form.add{margin-top:14px;display:grid;gap:10px;grid-template-columns:repeat(auto
       <span style="--c:var(--accent)">〇 言えた</span>
       <span>実線はお手本あり</span>
     </div>
+    <p class="hint" style="margin-top:8px">本文とふりがなは、文化ネット「外郎売」の練習用台本に合わせています。</p>
   </section>
 
   <section aria-labelledby="h-card" id="card-sec">
@@ -222,155 +227,170 @@ form.add{margin-top:14px;display:grid;gap:10px;grid-template-columns:repeat(auto
 const ITEMS = [
   ['sessha','拙者','せっしゃ','拙者親方と申すは'],
   ['oyakata','親方','おやかた','拙者親方と申すは'],
-  ['otachiai','お立ち会い','おたちあい','お立ち会いの中に'],
+  ['otachiai','お立合','おたちあい','お立合の中に'],
   ['gozonji','御存知','ごぞんじ','御存知のお方も'],
-  ['oedo','御江戸','おえど','御江戸を発って'],
+  ['oedo','お江戸','おえど','お江戸を発って'],
   ['nijuuri','二十里','にじゅうり','二十里上方'],
   ['kamigata','上方','かみがた','二十里上方'],
-  ['soushuu','相州','そうしゅう','相州小田原'],
+  ['soushuu','相州','そうしゅう','相州小田原一色町を'],
   ['odawara','小田原','おだわら','相州小田原一色町を'],
   ['isshiki','一色町','いっしきまち','小田原一色町を'],
   ['aomono','青物町','あおものちょう','青物町を登りへ'],
-  ['rankan','欄干橋','らんかんばし','欄干橋虎屋藤衛門'],
-  ['toraya','虎屋','とらや','虎屋藤衛門'],
-  ['touemon','藤衛門','とうえもん','虎屋藤衛門'],
+  ['rankan','欄干橋','らんかんばし','欄干橋虎屋藤右衛門'],
+  ['toraya','虎屋','とらや','虎屋藤右衛門'],
+  ['touemon','藤右衛門','とうえもん','虎屋藤右衛門'],
   ['teihatsu','剃髪','ていはつ','剃髪致して'],
-  ['ensai','円斎','えんさい','円斎となのりまする'],
+  ['ensai','円斎','えんさい','円斎と名乗りまする'],
   ['gancho','元朝','がんちょう','元朝より大晦日まで'],
   ['omisoka','大晦日','おおつごもり','元朝より大晦日まで'],
   ['toujin','唐人','とうじん','ちんの国の唐人'],
   ['uirou','外郎','ういろう','外郎という人'],
-  ['sandai','参内','さんだい','帝へ参内の折から'],
-  ['kanmuri','冠','かんむり','冠のすき間より'],
-  ['touchin','とうちんこう','とうちんこう','とうちんこうと賜る'],
+  ['sandai','参代','さんだい','帝へ参代の折から'],
+  ['kanmuri','冠','かんむり','冠の隙間より'],
+  ['touchin','透頂香','とうちんこう','「透頂香」と賜る'],
   ['sejou','世上','せじょう','殊の外世上に弘まり'],
   ['houbou','方々','ほうぼう','方々に似看板を出し'],
   ['nise','似看板','にせかんばん','方々に似看板を出し'],
   ['haidawara','灰俵','はいだわら','灰俵の、さん俵の'],
   ['sumidawara','炭俵','すみだわら','炭俵のと'],
   ['hiragana','平仮名','ひらがな','平仮名をもって'],
-  ['atami','熱海','あたみ','熱海か塔ノ沢へ'],
-  ['tounosawa','塔ノ沢','とうのさわ','熱海か塔ノ沢へ'],
+  ['atami','熱海','あたみ','熱海か塔の沢へ'],
+  ['tounosawa','塔の沢','とうのさわ','熱海か塔の沢へ'],
   ['toujiyu','湯治','とうじ','湯治にお出でなさるるか'],
   ['isesanguu','伊勢参宮','いせさんぐう','伊勢参宮の折からは'],
   ['kadochigai','門違い','かどちがい','必ず門違いなされまするな'],
-  ['happou','八方','はっぽう','八方が八棟'],
-  ['yatsumune','八棟','やつむね','八方が八棟'],
-  ['mitsumune','三棟','みつむね','表が三棟玉堂造り'],
-  ['gyokudou','玉堂造り','ぎょくどうづくり','三棟玉堂造り'],
+  ['happou','八方','はっぽう','八方が八つ棟'],
+  ['yatsumune','八つ棟','やつむね','八方が八つ棟'],
+  ['mitsumune','三つ棟','みつむね','表が三つ棟玉堂造'],
+  ['gyokudou','玉堂造','ぎょくどうづくり','三つ棟玉堂造'],
   ['hafu','破風','はふ','破風には菊に'],
-  ['gomon','御紋','ごもん','桐のとうの御紋を'],
+  ['gomon','御紋','ごもん','桐の薹の御紋を'],
   ['goshamen','御赦免','ごしゃめん','御紋を御赦免あって'],
   ['keizu','系図','けいず','系図正しき薬でござる'],
   ['saizen','最前','さいぜん','イヤ最前より'],
-  ['kamei','家名','かめい','家名の自慢ばかりを'],
-  ['shoushin','正身','しょうしん','正身の胡椒の丸呑み'],
-  ['koshou','胡椒','こしょう','正身の胡椒の丸呑み'],
-  ['marunomi','丸呑み','まるのみ','胡椒の丸呑み'],
-  ['shirakawa','白河夜船','しらかわよふね','白河夜船'],
+  ['kamei','家名','かめい','家名の自慢ばかり'],
+  ['shoushin','正身','しょうしん','正身の胡椒の丸呑'],
+  ['koshou','胡椒','こしょう','正身の胡椒の丸呑'],
+  ['marunomi','丸呑','まるのみ','胡椒の丸呑'],
+  ['shirakawa','白川夜船','しらかわよふね','白川夜船'],
   ['ichiryuu','一粒','いちりゅう','さらば一粒食べかけて'],
-  ['kimiai','気見合い','きみあい','その気見合いをお目にかけましょう'],
+  ['kimiai','気味合','きみあい','その気味合をお目にかけましょう'],
   ['hitotsubu','一粒','ひとつぶ','かように一粒舌の上に'],
   ['fukunai','腹内','ふくない','腹内へ納めますると'],
-  ['kunpuu','薫風','くんぷう','薫風喉より来たり'],
-  ['nondo','喉','のんど','薫風喉より来たり'],
+  ['kunpuu','薫風','くんぷう','薫風咽より来り'],
+  ['nondo','咽','のんど','薫風咽より来り'],
   ['kouchuu','口中','こうちゅう','口中微涼を生ずるが如し'],
   ['biryou','微涼','びりょう','口中微涼を生ずるが如し'],
   ['gyochou','魚鳥','ぎょちょう','魚鳥、茸、麺類の'],
   ['kinoko','茸','きのこ','魚鳥、茸、麺類の'],
   ['menrui','麺類','めんるい','麺類の食合わせ'],
-  ['manbyou','万病','まんびょう','万病速効ある事'],
-  ['sokkou','速効','そっこう','万病速効ある事'],
+  ['manbyou','万病','まんびょう','万病速攻あること'],
+  ['sokkou','速攻','そっこう','万病速攻あること'],
   ['kimyou','奇妙','きみょう','第一の奇妙には'],
-  ['zenigoma','銭ゴマ','ぜにごま','銭ゴマがはだしで逃げる'],
-  ['nodo','咽','のど','アワヤ咽'],
+  ['zenigoma','銭独楽','ぜにごま','銭独楽が裸足で逃げる'],
+  ['nodo','咽','のんど','アワヤ咽'],
   ['shion','歯音','しおん','カ牙サ歯音'],
   ['kuchibiru','唇','くちびる','唇の軽重'],
-  ['keichou','軽重','けいちょう','唇の軽重'],
-  ['kaigou','開合','かいごう','開合さわやかに'],
-  ['bonmame','盆まめ','ぼんまめ','盆まめ、盆米、盆ごぼう'],
-  ['bongome','盆米','ぼんごめ','盆まめ、盆米、盆ごぼう'],
-  ['bongobou','盆ごぼう','ぼんごぼう','盆まめ、盆米、盆ごぼう'],
-  ['tsumitate','摘立','つみたて','摘立、摘豆、つみ山椒'],
-  ['tsumimame','摘豆','つみまめ','摘立、摘豆、つみ山椒'],
-  ['tsumizanshou','つみ山椒','つみざんしょう','摘立、摘豆、つみ山椒'],
+  ['keichou','軽重','けいじゅう','唇の軽重'],
+  ['kaigou','開口','かいごう','開口爽やかに'],
+  ['bonmame','盆豆','ぼんまめ','盆豆、盆米、盆牛蒡'],
+  ['bongome','盆米','ぼんごめ','盆豆、盆米、盆牛蒡'],
+  ['bongobou','盆牛蒡','ぼんごぼう','盆豆、盆米、盆牛蒡'],
+  ['tsumitate','摘蓼','つみたで','摘蓼、摘豆、摘山椒'],
+  ['tsumimame','摘豆','つみまめ','摘蓼、摘豆、摘山椒'],
+  ['tsumizanshou','摘山椒','つみざんしょう','摘蓼、摘豆、摘山椒'],
   ['shoshazan','書写山','しょしゃざん','書写山の社僧正'],
   ['shasoujou','社僧正','しゃそうじょう','書写山の社僧正'],
-  ['kogome','粉米','こごめ','粉米のなまがみ'],
-  ['shusu','繻子','しゅす','繻子、繻珍'],
-  ['shuchin','繻珍','しゅちん','繻子、繻珍'],
+  ['kogome','粉米','こごめ','粉米の生噛'],
+  ['namagami','生噛','なまがみ','粉米の生噛'],
+  ['shusu','繻子','しゅす','繻子緋繻子、繻子繻珍'],
+  ['hijusu','緋繻子','ひじゅす','繻子緋繻子'],
+  ['shuchin','繻珍','しゅちん','繻子繻珍'],
   ['kahee','嘉兵衛','かへえ','親も嘉兵衛、子も嘉兵衛'],
   ['furukuri','古栗','ふるくり','古栗の木の古切口'],
-  ['furukirikuchi','古切口','ふるきりくち','古栗の木の古切口'],
-  ['amagappa','雨合羽','あまがっぱ','雨合羽か、番合羽か'],
-  ['bangappa','番合羽','ばんがっぱ','雨合羽か、番合羽か'],
-  ['kawagyahan','皮脚絆','かわぎゃはん','貴様のきゃはんも皮脚絆'],
-  ['mihari','三針','みはり','三針はりなかにちょと縫うて'],
-  ['nadeshiko','かわら撫子','かわらなでしこ','かわら撫子、野石竹'],
-  ['nosekichiku','野石竹','のせきちく','かわら撫子、野石竹'],
+  ['furukirikuchi','古切口','ふるきりぐち','古栗の木の古切口'],
+  ['amagappa','雨合羽','あまがっぱ','雨合羽か番合羽か'],
+  ['bangappa','番合羽','ばんがっぱ','雨合羽か番合羽か'],
+  ['kyahan','脚絆','きゃはん','貴様の脚絆も皮脚絆'],
+  ['kawagyahan','皮脚絆','かわぎゃはん','貴様の脚絆も皮脚絆'],
+  ['shikkawa','尻皮袴','しっかわばかま','尻皮袴のしっぽころびを'],
+  ['mihari','三針針長','みはりはりなが','三針針長にちょと縫うて'],
+  ['nadeshiko','河原撫子','かわらなでしこ','河原撫子、野石竹'],
+  ['nosekichiku','野石竹','のぜきちく','河原撫子、野石竹'],
+  ['nora','野良如来','のらにょらい','野良如来、野良如来'],
+  ['choto','一寸先','ちょとさき','一寸先のお小仏に'],
   ['kobotoke','小仏','こぼとけ','一寸先のお小仏に'],
-  ['hosomizo','細溝','ほそみぞ','細溝にどじょにょろり'],
-  ['namadara','なま鱈','なまだら','京のなま鱈'],
-  ['managatsuo','真魚鰹','まながつお','奈良なま真魚鰹'],
+  ['hosomizo','細溝','ほそどぶ','細溝に泥鰌にょろり'],
+  ['dojo','泥鰌','どじょ','細溝に泥鰌にょろり'],
+  ['namadara','生鱈','なまだら','京の生鱈'],
+  ['managatsuo','生学鰹','なままながつお','奈良生学鰹'],
   ['shigokanme','四、五貫目','しごかんめ','ちょと四、五貫目'],
-  ['aodake','青竹','あおだけ','青竹茶せんで'],
-  ['chasen','茶せん','ちゃせん','青竹茶せんで'],
+  ['aodake','青竹','あおたけ','青竹茶筅で'],
+  ['chasen','茶筅','ちゃせん','青竹茶筅で'],
   ['kouya','高野','こうや','高野の山の'],
   ['kokera','こけら小僧','こけらこぞう','おこけら小僧'],
-  ['tanuki','狸','たぬき','狸百匹'],
-  ['tenmoku','天目','てんもく','天目百杯'],
-  ['bugu','武具','ぶぐ','武具、馬具'],
-  ['bagu','馬具','ばぐ','武具、馬具'],
+  ['tanuki','狸百匹','たぬきひゃっぴき','狸百匹、箸百膳'],
+  ['hashi','箸百膳','はしひゃくぜん','狸百匹、箸百膳'],
+  ['tenmoku','天目百杯','てんもくひゃっぱい','天目百杯、棒八百本'],
+  ['bou','棒八百本','ぼうはっぴゃっぽん','天目百杯、棒八百本'],
+  ['bugu','武具馬具','ぶぐばぐ','武具馬具、ぶく、ばぐ'],
+  ['bagu','馬具','ばぐ','武具馬具'],
+  ['kikukuri','菊栗','きくくり','菊栗、きく、くり'],
   ['nageshi','長押','なげし','あの長押の長薙刀は'],
   ['naginata','長薙刀','ながなぎなた','あの長押の長薙刀は'],
-  ['gomagara','胡麻がら','ごまがら','向こうの胡麻がらは'],
-  ['magomagara','真胡麻殻','まごまがら','あれこそほんの真胡麻殻'],
+  ['gomagara','胡麻殻','ごまがら','向うの胡麻殻は'],
+  ['magomagara','真胡麻殻','まごまがら','あれこそ本の真胡麻殻'],
   ['kazaguruma','風車','かざぐるま','がらぴい風車'],
-  ['koboshi','小坊師','こぼし','おきゃがれ小坊師'],
-  ['icchoudako','一丁だこ','いっちょうだこ','たっぽたっぽの一丁だこ'],
-  ['gotoku','五徳','ごとく','五徳、鉄きゅう'],
-  ['tekkyuu','鉄きゅう','てっきゅう','五徳、鉄きゅう'],
-  ['kanakuma','かな熊童子','かなくまどうじ','かな熊童子に'],
+  ['koboshi','小法師','こぼし','おきゃがれ小法師'],
+  ['koboushi','小法師','こぼうし','おきゃがれ小法師'],
+  ['yunbe','昨夜','ゆんべ','昨夜もこぼして'],
+  ['icchoudako','一丁蛸','いっちょうだこ','たっぽたっぽ、一丁蛸'],
+  ['gotoku','五徳','ごとく','五徳、鉄弓'],
+  ['tekkyuu','鉄弓','てっきゅう','五徳、鉄弓'],
+  ['kanakuma','金熊童子','かなくまどうじ','金熊童子に'],
   ['ishikuma','石熊','いしくま','石熊、石持'],
   ['ishimochi','石持','いしもち','石熊、石持'],
-  ['torakuma','虎熊','とらくま','虎熊、虎きす'],
-  ['torakisu','虎きす','とらぎす','虎熊、虎きす'],
+  ['torakuma','虎熊','とらくま','虎熊、虎鱚'],
+  ['torakisu','虎鱚','とらきす','虎熊、虎鱚'],
   ['toujitera','東寺','とうじ','東寺の羅生門には'],
   ['rashoumon','羅生門','らしょうもん','東寺の羅生門には'],
-  ['ibaraki','茨城童子','いばらきどうじ','茨城童子がうで栗五合'],
-  ['raikou','頼光','らいこう','かの頼光のひざもと去らず'],
-  ['funa','鮒','ふな','鮒、きんかん、椎茸'],
-  ['kinkan','きんかん','きんかん','鮒、きんかん、椎茸'],
-  ['shiitake','椎茸','しいたけ','鮒、きんかん、椎茸'],
+  ['ibaraki','茨木童子','いばらきどうじ','茨木童子が'],
+  ['raikou','頼光','らいこう','かの頼光の膝元去らず'],
+  ['hizamoto','膝元','ひざもと','かの頼光の膝元去らず'],
+  ['funa','鮒','ふな','鮒、金柑、椎茸'],
+  ['kinkan','金柑','きんかん','鮒、金柑、椎茸'],
+  ['shiitake','椎茸','しいたけ','鮒、金柑、椎茸'],
   ['godan','後段','ごだん','定めて後段な'],
-  ['sobakiri','そば切り','そばきり','そば切り、そうめん'],
-  ['soumen','そうめん','そうめん','そば切り、そうめん'],
-  ['udon','うどん','うどん','うどんか、愚鈍な小新発知'],
-  ['gudon','愚鈍','ぐどん','うどんか、愚鈍な小新発知'],
-  ['koshinbochi','小新発知','こしんぼち','愚鈍な小新発知'],
-  ['kodana','小棚','こだな','小棚の小下の小桶に'],
-  ['koshita','小下','こした','小棚の小下の小桶に'],
-  ['kooke','小桶','こおけ','小棚の小下の小桶に'],
-  ['kojakushi','小杓子','こじゃくし','小杓子こ持って'],
+  ['sobakiri','蕎麦切り','そばきり','蕎麦切り、素麺'],
+  ['soumen','素麺','そうめん','蕎麦切り、素麺'],
+  ['udon','饂飩','うどん','饂飩か、愚鈍な小新発地'],
+  ['gudon','愚鈍','ぐどん','愚鈍な小新発地'],
+  ['koshinbochi','小新発地','こしんぼち','愚鈍な小新発地'],
+  ['kodana','小棚','こだな','小棚の、小下の、小桶に'],
+  ['koshita','小下','こした','小棚の、小下の、小桶に'],
+  ['kooke','小桶','こおけ','小棚の、小下の、小桶に'],
+  ['kojakushi','小杓子','こしゃくし','小杓子、こ持って'],
   ['gaten','合点','がてん','おっと合点だ'],
-  ['kawasaki','川崎','かわさき','心得たんぼの川崎'],
-  ['kanagawa','神奈川','かながわ','川崎、神奈川、程ヶ谷、戸塚は'],
-  ['hodogaya','程ヶ谷','ほどがや','川崎、神奈川、程ヶ谷、戸塚は'],
-  ['totsuka','戸塚','とつか','川崎、神奈川、程ヶ谷、戸塚は'],
-  ['yaito','やいと','やいと','やいとを擦りむく'],
+  ['kawasaki','川崎','かわさき','川崎、神奈川'],
+  ['kanagawa','神奈川','かながわ','川崎、神奈川'],
+  ['hodogaya','程ケ谷','ほどがや','程ケ谷、戸塚は'],
+  ['totsuka','戸塚','とつか','程ケ谷、戸塚は'],
+  ['yaito','灸','やいと','灸を擦りむく'],
   ['sanri','三里','さんり','三里ばかりか'],
-  ['fujisawa','藤沢','ふじさわ','藤沢、平塚、大磯がしや'],
-  ['hiratsuka','平塚','ひらつか','藤沢、平塚、大磯がしや'],
-  ['ooiso','大磯','おおいそ','藤沢、平塚、大磯がしや'],
-  ['koiso','小磯','こいそ','小磯の宿を七つ起きして'],
-  ['souten','早天','そうてん','早天早々'],
-  ['kisen','貴賤群衆','きせんぐんじゅ','隠れござらぬ貴賤群衆の'],
-  ['hanauirou','花ういろう','はなういろう','花のお江戸の花ういろう'],
+  ['fujisawa','藤沢','ふじさわ','藤沢、平塚'],
+  ['hiratsuka','平塚','ひらつか','藤沢、平塚'],
+  ['ooiso','大磯','おおいそ','大磯がしや'],
+  ['koiso','小磯','こいそ','小磯の宿を'],
+  ['shuku','宿','しゅく','小磯の宿を七つ起きして'],
+  ['souten','早天早々','そうてんそうそう','早天早々'],
+  ['kisen','貴賤群衆','きせんぐんじゅ','貴賤群衆の花のお江戸の'],
+  ['hanauirou','花ういろう','はなういろう','お江戸の花ういろう'],
   ['ubuko','産子','うぶこ','産子、這子に至るまで'],
-  ['houko','這子','ほうこ','産子、這子に至るまで'],
-  ['hyouban','評判','ひょうばん','この外郎のご評判'],
-  ['suribachi','すりばち','すりばち','臼、杵、すりばち'],
-  ['hame','羽目','はめ','羽目をはずして'],
+  ['houko','這子','はうこ','産子、這子に至るまで'],
+  ['hyouban','御評判','ごひょうばん','この外郎の御評判'],
+  ['suribachi','擂鉢','すりばち','臼、杵、擂鉢'],
+  ['hame','羽目','はめ','羽目を外して'],
+  ['konnichi','今日','こんにち','今日御出の'],
   ['touhou','東方世界','とうほうせかい','東方世界の薬の元締め'],
   ['motojime','元締め','もとじめ','東方世界の薬の元締め'],
   ['yakushi','薬師如来','やくしにょらい','薬師如来も照覧あれと'],
@@ -378,31 +398,36 @@ const ITEMS = [
 ];
 const SECTIONS = [
   {label:'拙者親方と', paras:[
-    '{sessha}{oyakata}と申すは、{otachiai}の中に、{gozonji}のお方も御座りましょうが、{oedo}を発って{nijuuri}{kamigata}、{soushuu}{odawara}{isshiki}をお過ぎなされて、{aomono}を登りへおいでなさるれば、{rankan}{toraya}{touemon}、只今は{teihatsu}致して、{ensai}となのりまする。',
-    '{gancho}より{omisoka}まで、お手に入れまする此の薬は、昔ちんの国の{toujin}、{uirou}という人、我が朝へ来たり、帝へ{sandai}の折から、この薬を深く籠め置き、用ゆる時は一粒ずつ、{kanmuri}のすき間より取り出す。依ってその名を帝より、{touchin}と賜る。即ち文字には、「頂き、透く、香い」と書いて「{touchin}」と申す。',
-    '只今はこの薬、殊の外{sejou}に弘まり、{houbou}に{nise}を出し、イヤ、{odawara}の、{haidawara}の、さん俵の、{sumidawara}のと、色々に申せども、{hiragana}をもって「ういろう」と記せしは、{oyakata}{ensai}ばかり。'
+    '{sessha:[拙者|せっしゃ]}{oyakata:[親方|おやかた]}と[申|もう]すは、{otachiai:お[立合|たちあい]}の[中|うち]に{gozonji:[御存知|ごぞんじ]}のお[方|かた]もござりましょうが、{oedo:お[江戸|えど]}を[発|た]って{nijuuri:[二十里|にじゅうり]}{kamigata:[上方|かみがた]}、{soushuu:[相州|そうしゅう]}{odawara:[小田原|おだわら]}{isshiki:[一色町|いっしきまち]}をお[過|す]ぎなされて、{aomono:[青物町|あおものちょう]}を[登|のぼ]りへおいでなさるれば、{rankan:[欄干橋|らんかんばし]}{toraya:[虎屋|とらや]}{touemon:[藤右衛門|とうえもん]}、[只今|ただいま]は{teihatsu:[剃髪|ていはつ]}[致|いた]して、{ensai:[円斎|えんさい]}と[名乗|なの]りまする。',
+    '{gancho:[元朝|がんちょう]}より{omisoka:[大晦日|おおつごもり]}まで、[御手|おて]に[入|い]れまする[此|こ]の[薬|くすり]は、[昔|むかし]ちんの[国|くに]の{toujin:[唐人|とうじん]}、{uirou:[外郎|ういろう]}という[人|ひと]、わが[朝|ちょう]へ[来|きた]り、[帝|みかど]へ{sandai:[参代|さんだい]}の[折|おり]から、[此|こ]の[薬|くすり]を[深|ふか]く[籠|こ]め[置|お]き、[用|もち]ゆる[時|とき]は[一粒|ひとつぶ]ずつ、{kanmuri:[冠|かんむり]}の[隙間|すきま]より[取|と]り[出|いだ]す。[依|よ]って[其|そ]の[名|な]を[帝|みかど]より、「{touchin:[透頂香|とうちんこう]}」と[賜|たまわ]る。[即|すなわ]ち[文字|もんじ]には、[頂|いただ]き、[透|す]く、[香|にお]いと[書|か]いて、{touchin:とうちんこう}と[申|もう]す。',
+    '[只今|ただいま]は[此|こ]の[薬|くすり]、[殊|こと]の[外|ほか]{sejou:[世上|せじょう]}に[弘|ひろ]まり、{houbou:[方々|ほうぼう]}に{nise:[似看板|にせかんばん]}を[出|いだ]し、イヤ、{odawara:[小田原|おだわら]}の、{haidawara:[灰俵|はいだわら]}の、さん[俵|だわら]の、{sumidawara:[炭俵|すみだわら]}のと[色々|いろいろ]に[申|もう]せども、{hiragana:[平仮名|ひらがな]}をもって「ういろう」と[記|しる]せしは{oyakata:[親方|おやかた]}{ensai:[円斎|えんさい]}ばかり。'
   ]},
-  {label:'もしやお立ち会い', paras:[
-    'もしや{otachiai}の中に、{atami}か{tounosawa}へ{toujiyu}にお出でなさるるか、又は{isesanguu}の折からは、必ず{kadochigai}なされまするな。お登りならば右の方、お下りなれば左側、{happou}が{yatsumune}、表が{mitsumune}{gyokudou}、{hafu}には菊に桐のとうの{gomon}を{goshamen}あって、{keizu}正しき薬でござる。',
-    'イヤ{saizen}より{kamei}の自慢ばかりを申しても、{gozonji}ない方には、{shoushin}の{koshou}の{marunomi}、{shirakawa}、さらば{ichiryuu}食べかけて、その{kimiai}をお目にかけましょう。先ずこの薬をかように{hitotsubu}舌の上にのせまして、{fukunai}へ納めますると、イヤどうも云えぬは、胃、心、肺、肝がすこやかになりて、{kunpuu}{nondo}より来たり、{kouchuu}{biryou}を生ずるが如し、{gyochou}、{kinoko}、{menrui}の食合わせ、其の他、{manbyou}{sokkou}ある事神の如し。',
-    'さて、この薬、第一の{kimyou}には、舌のまわることが、{zenigoma}がはだしで逃げる。ひょっと舌がまわり出すと、矢も盾もたまらぬじゃ。そりゃそら、そらそりゃ、まわってきたわ、まわってくるわ。'
+  {label:'もしやお立合', paras:[
+    'もしや{otachiai:お[立合|たちあい]}の[内|うち]に、{atami:[熱海|あたみ]}か{tounosawa:[塔|とう]の[沢|さわ]}へ{toujiyu:[湯治|とうじ]}にお[出|い]でなさるるか、[又|また]は{isesanguu:[伊勢参宮|いせさんぐう]}の[折|おり]からは、[必|かなら]ず{kadochigai:[門違|かどちが]い}なされまするな。お[登|のぼ]りならば[右|みぎ]の[方|かた]、お[下|くだ]りなれば[左側|ひだりがわ]、{happou:[八方|はっぽう]}が{yatsumune:[八|や]つ[棟|むね]}、[表|おもて]が{mitsumune:[三|み]つ[棟|むね]}{gyokudou:[玉堂造|ぎょくどうづくり]}、{hafu:[破風|はふ]}には[菊|きく]に[桐|きり]の[薹|とう]の{gomon:[御紋|ごもん]}を{goshamen:[御赦免|ごしゃめん]}あって、{keizu:[系図|けいず]}[正|ただ]しき[薬|くすり]でござる。',
+    'イヤ{saizen:[最前|さいぜん]}より{kamei:[家名|かめい]}の[自慢|じまん]ばかり[申|もう]しても、{gozonji:[御存|ごぞん]じ}ない[方|かた]には、{shoushin:[正身|しょうしん]}の{koshou:[胡椒|こしょう]}の{marunomi:[丸呑|まるのみ]}、{shirakawa:[白川夜船|しらかわよふね]}。さらば{ichiryuu:[一粒|いちりゅう]}[食|た]べかけて、その{kimiai:[気味合|きみあい]}をお[目|め]にかけましょう。[先|ま]ず[此|こ]の[薬|くすり]を、かように{hitotsubu:[一粒|ひとつぶ]}[舌|した]の[上|うえ]に[乗|の]せまして、{fukunai:[腹内|ふくない]}へ[納|おさ]めますると、イヤどうも[云|い]えぬは、[胃|い]、[心|しん]、[肺|はい]、[肝|かん]が[健|すこ]やかになりて、{kunpuu:[薫風|くんぷう]}{nondo:[咽|のんど]}より[来|きた]り、{kouchuu:[口中|こうちゅう]}{biryou:[微涼|びりょう]}を[生|しょう]ずるが[如|ごと]し。{gyochou:[魚鳥|ぎょちょう]}、{kinoko:[茸|きのこ]}、{menrui:[麺類|めんるい]}の[食合|くいあ]わせ、[其|そ]の[外|ほか]、{manbyou:[万病|まんびょう]}{sokkou:[速攻|そっこう]}あること[神|かみ]の[如|ごと]し。',
+    'さて、[此|こ]の[薬|くすり]、[第一|だいいち]の{kimyou:[奇妙|きみょう]}には、[舌|した]の[廻|まわ]ることが、{zenigoma:[銭独楽|ぜにごま]}が[裸足|はだし]で[逃|に]げる。ひょっと[舌|した]が[廻|まわ]り[出|だ]すと、[矢|や]も[楯|たて]も[堪|たま]らぬじゃ。'
   ]},
-  {label:'アワヤ咽', paras:[
-    'アワヤ{nodo}、さたらな舌にカ牙サ{shion}、ハマの二つは{kuchibiru}の{keichou}、{kaigou}さわやかに、あかさたなはまやらわ、おこそとのほもよろを、一つへぎへぎに、へぎほしはじかみ、{bonmame}、{bongome}、{bongobou}、{tsumitate}、{tsumimame}、{tsumizanshou}、{shoshazan}の{shasoujou}、{kogome}のなまがみ、{kogome}のなまがみ、こん粉米の小生がみ、',
-    '{shusu}ひじゅす、{shusu}、{shuchin}、親も{kahee}、子も{kahee}、親かへい子かへい、子かへい親かへい、{furukuri}の木の{furukirikuchi}。{amagappa}か、{bangappa}か、貴様のきゃはんも{kawagyahan}、我等がきゃはんも{kawagyahan}、しっかわ袴のしっぽころびを、{mihari}はりなかにちょと縫うて、ぬうてちょとぶんだせ、{nadeshiko}、{nosekichiku}。のら如来、のら如来、三のら如来に六のら如来。一寸先のお{kobotoke}におけつまずきゃるな、{hosomizo}にどじょにょろり。'
+  {label:'そりゃそりゃ', paras:[
+    'そりゃそりゃ、そらそりゃ。[廻|まわ]って[来|き]たわ、[廻|まわ]って[来|く]るわ。',
+    'アワヤ{nodo:[咽|のんど]}、さたらな[舌|した]に、カ[牙|げ]サ{shion:[歯音|しおん]}。ハマの[二|ふた]つは{kuchibiru:[唇|くちびる]}の{keichou:[軽重|けいじゅう]}、{kaigou:[開口|かいごう]}[爽|さわ]やかに、あかさたなはまやらわ、おこそとのほもよろを、[一|ひと]つへぎへぎに、へぎほしはじかみ。',
+    '{bonmame:[盆豆|ぼんまめ]}、{bongome:[盆米|ぼんごめ]}、{bongobou:[盆牛蒡|ぼんごぼう]}。{tsumitate:[摘蓼|つみたで]}、{tsumimame:[摘豆|つみまめ]}、{tsumizanshou:[摘山椒|つみざんしょう]}、{shoshazan:[書写山|しょしゃざん]}の{shasoujou:[社僧正|しゃそうじょう]}。{kogome:[粉米|こごめ]}の{namagami:[生噛|なまがみ]}、{kogome:[粉米|こごめ]}の{namagami:[生噛|なまがみ]}、こん[粉米|こごめ]の[小生噛|こなまがみ]。',
+    '{shusu:[繻子|しゅす]}{hijusu:[緋繻子|ひじゅす]}、{shusu:[繻子|しゅす]}{shuchin:[繻珍|しゅちん]}、[親|おや]も{kahee:[嘉兵衛|かへえ]}、[子|こ]も{kahee:[嘉兵衛|かへえ]}、[親嘉兵衛|おやかへえ][子嘉兵衛|こかへえ]、[子嘉兵衛|こかへえ][親嘉兵衛|おやかへえ]。{furukuri:[古栗|ふるくり]}の[木|き]の{furukirikuchi:[古切口|ふるきりぐち]}。{amagappa:[雨合羽|あまがっぱ]}か{bangappa:[番合羽|ばんがっぱ]}か。[貴様|きさま]の{kyahan:[脚絆|きゃはん]}も{kawagyahan:[皮脚絆|かわぎゃはん]}、[我等|われら]が{kyahan:[脚絆|きゃはん]}も{kawagyahan:[皮脚絆|かわぎゃはん]}。',
+    '{shikkawa:[尻皮袴|しっかわばかま]}のしっぽころびを、{mihari:[三針針長|みはりはりなが]}にちょと[縫|ぬ]うて、[縫|ぬ]うてちょとぶん[出|だ]せ、{nadeshiko:[河原撫子|かわらなでしこ]}、{nosekichiku:[野石竹|のぜきちく]}。{nora:[野良如来|のらにょらい]}、{nora:[野良如来|のらにょらい]}、[三野良如来|みのらにょらい]に[六野良如来|むのらにょらい]。{choto:[一寸先|ちょとさき]}のお{kobotoke:[小仏|こぼとけ]}にお[蹴躓|けつまず]きゃるな。{hosomizo:[細溝|ほそどぶ]}に{dojo:[泥鰌|どじょ]}にょろり。'
   ]},
-  {label:'京のなま鱈', paras:[
-    '京の{namadara}、奈良なま{managatsuo}、ちょと{shigokanme}、お茶立ちょ、茶立ちょ、ちゃっと立ちょ、茶立ちょ、{aodake}{chasen}でお茶ちゃと立ちゃ。',
-    '来るは来るは何が来る、{kouya}の山のお{kokera}。{tanuki}百匹、箸百膳、{tenmoku}百杯、棒八百本。{bugu}、{bagu}、ぶぐ、ばぐ、三ぶぐばぐ、合わせて{bugu}、{bagu}、六ぶぐばぐ。菊、栗、きく、くり、三菊栗、合わせて菊栗六菊栗、麦、ごみ、むぎ、ごみ、三むぎごみ、合わせてむぎ、ごみ、六むぎごみ。',
-    'あの{nageshi}の{naginata}は、誰が{naginata}ぞ。向こうの{gomagara}は、えのごまがらか、あれこそほんの{magomagara}。がらぴい、がらぴい{kazaguruma}、おきゃがれこぼし、おきゃがれ{koboshi}、ゆんべもこぼして又こぼした。',
-    'たあぷぽぽ、たあぷぽぽ、ちりから、ちりから、つったっぽ、たっぽたっぽの{icchoudako}、落ちたら煮て食お、煮ても焼いても食われぬものは、{gotoku}、{tekkyuu}、{kanakuma}に、{ishikuma}、{ishimochi}、{torakuma}、{torakisu}、中にも、{toujitera}の{rashoumon}には、{ibaraki}がうで栗五合つかんでおむしゃる、かの{raikou}のひざもと去らず。',
-    '{funa}、{kinkan}、{shiitake}、定めて{godan}な、{sobakiri}、{soumen}、{udon}か、{gudon}な{koshinbochi}、'
+  {label:'京の生鱈', paras:[
+    '[京|きょう]の{namadara:[生鱈|なまだら]}、[奈良|なら]{managatsuo:[生学鰹|なままながつお]}、ちょと{shigokanme:[四|し]、[五貫目|ごかんめ]}。お[茶|ちゃ][立|た]ちょ、[茶|ちゃ][立|だ]ちょ、ちゃっと[立|た]ちょ、[茶|ちゃ][立|だ]ちょ、{aodake:[青竹|あおたけ]}{chasen:[茶筅|ちゃせん]}でお[茶|ちゃ]ちゃっと[立|た]ちゃ。',
+    '[来|く]るわ[来|く]るわ[何|なに]が[来|く]る、{kouya:[高野|こうや]}の[山|やま]のお{kokera:こけら[小僧|こぞう]}。{tanuki:[狸百匹|たぬきひゃっぴき]}、{hashi:[箸百膳|はしひゃくぜん]}、{tenmoku:[天目百杯|てんもくひゃっぱい]}、{bou:[棒八百本|ぼうはっぴゃっぽん]}。',
+    '{bugu:[武具馬具|ぶぐばぐ]}、ぶく、ばぐ、[三武具馬具|みぶぐばぐ]、[合|あ]わせて{bugu:[武具馬具|ぶぐばぐ]}、[六武具馬具|むぶぐばぐ]。{kikukuri:[菊栗|きくくり]}、きく、くり、[三菊栗|みきくくり]、[合|あ]わせて{kikukuri:[菊栗|きくくり]}、[六菊栗|むきくくり]。[麦|むぎ]、ごみ、むぎ、ごみ、[三麦|みむぎ]ごみ、[合|あ]わせて[麦|むぎ]、ごみ、[六麦|むむぎ]ごみ。',
+    'あの{nageshi:[長押|なげし]}の{naginata:[長薙刀|ながなぎなた]}は、[誰|た]が{naginata:[長薙刀|ながなぎなた]}ぞ。[向|むこ]うの{gomagara:[胡麻殻|ごまがら]}は[荏|え]の{gomagara:[胡麻殻|ごまがら]}か、{magomagara:[真胡麻殻|まごまがら]}か、あれこそ[本|ほん]の{magomagara:[真胡麻殻|まごまがら]}。がらぴい、がらぴい{kazaguruma:[風車|かざぐるま]}。おきゃがれ{koboshi:[小法師|こぼし]}、おきゃがれ{koboushi:[小法師|こぼうし]}、{yunbe:[昨夜|ゆんべ]}もこぼして、[又|また]こぼした。',
+    'たあぷぽぽ、たあぷぽぽ、ちりから、ちりから、つったっぽ。たっぽたっぽ、{icchoudako:[一丁蛸|いっちょうだこ]}、[落|おち]たら[煮|に]て[食|く]を。[煮|に]ても[焼|や]いても[食|く]われぬものは、{gotoku:[五徳|ごとく]}、{tekkyuu:[鉄弓|てっきゅう]}、{kanakuma:[金熊童子|かなくまどうじ]}に、{ishikuma:[石熊|いしくま]}、{ishimochi:[石持|いしもち]}、{torakuma:[虎熊|とらくま]}、{torakisu:[虎鱚|とらきす]}、[中|なか]にも{toujitera:[東寺|とうじ]}の{rashoumon:[羅生門|らしょうもん]}には、{ibaraki:[茨木童子|いばらきどうじ]}が、うで[栗|ぐり][五合|ごんごう]、[掴|つか]んでおむしゃる、かの{raikou:[頼光|らいこう]}の{hizamoto:[膝元|ひざもと]}[去|さ]らず。'
   ]},
-  {label:'小棚の小下の', paras:[
-    '{kodana}の{koshita}の{kooke}に、こ味噌がこ有るぞ、{kojakushi}こ持って、こすくってこよこせ、おっと{gaten}だ、心得たんぼの{kawasaki}、{kanagawa}、{hodogaya}、{totsuka}は、走って行けば、{yaito}を擦りむく、{sanri}ばかりか、{fujisawa}、{hiratsuka}、{ooiso}がしや、{koiso}の宿を七つ起きして、{souten}早々、{soushuu}{odawara}{touchin:とうちん香}、'
+  {label:'鮒、金柑', paras:[
+    '{funa:[鮒|ふな]}、{kinkan:[金柑|きんかん]}、{shiitake:[椎茸|しいたけ]}、[定|さだ]めて{godan:[後段|ごだん]}な、{sobakiri:[蕎麦|そば][切|き]り}、{soumen:[素麺|そうめん]}、{udon:[饂飩|うどん]}か、{gudon:[愚鈍|ぐどん]}な{koshinbochi:[小新発地|こしんぼち]}。',
+    '{kodana:[小棚|こだな]}の、{koshita:[小下|こした]}の、{kooke:[小桶|こおけ]}に、こ[味噌|みそ]が、こ[有|あ]るぞ、{kojakushi:[小杓子|こしゃくし]}、こ[持|も]って、こすくって、こよこせ。おっと{gaten:[合点|がてん]}だ、[心得|こころえ]たんぼの、{kawasaki:[川崎|かわさき]}、{kanagawa:[神奈川|かながわ]}、{hodogaya:[程ケ谷|ほどがや]}、{totsuka:[戸塚|とつか]}は、[走|はし]って[行|い]けば、{yaito:[灸|やいと]}を[擦|す]りむく、{sanri:[三里|さんり]}ばかりか、{fujisawa:[藤沢|ふじさわ]}、{hiratsuka:[平塚|ひらつか]}、{ooiso:[大磯|おおいそ]}がしや、{koiso:[小磯|こいそ]}の{shuku:[宿|しゅく]}を[七|なな]つ[起|お]きして、{souten:[早天早々|そうてんそうそう]}、{soushuu:[相州|そうしゅう]}{odawara:[小田原|おだわら]}{touchin:[透頂香|とうちんこう]}、'
   ]},
   {label:'隠れござらぬ', paras:[
-    '隠れござらぬ{kisen}の、花の{oedo:お江戸}の{hanauirou}。あれあの花を見てお心をおやわらぎやという。{ubuko}、{houko}に至るまで、この{uirou}のご{hyouban}、ご存じないとは申されまいまいつぶり、角出せ、棒出せ、ぼうぼうまゆに、臼、杵、{suribachi}、ばちばちぐわらぐわらぐわらと、{hame}をはずして今日お出でのいずれも様に、上げねばならぬ、売らねばならぬと息せい引っぱり、{touhou}の薬の{motojime}、{yakushi}も{shouran}あれと、ホホ敬って、ういろうは、いらっしゃりませぬか。'
+    '[隠|かく]れござらぬ、{kisen:[貴賤群衆|きせんぐんじゅ]}の[花|はな]の{oedo:お[江戸|えど]}の{hanauirou:[花|はな]ういろう}。あれあの[花|はな]を[見|み]てお[心|こころ]をお[和|やわ]らぎやという。',
+    '{ubuko:[産子|うぶこ]}、{houko:[這子|はうこ]}に[至|いた]るまで、この{uirou:[外郎|ういろう]}の{hyouban:[御評判|ごひょうばん]}、{gozonji:[御存知|ごぞんじ]}ないとは[申|もう]されまいまいつぶり、[角|つの][出|だ]せ、[棒|ぼう][出|だ]せ、ぼうぼう[眉|まゆ]に、[臼|うす]、[杵|きね]、{suribachi:[擂鉢|すりばち]}、ばちばちぐゎらぐゎらぐゎらと、{hame:[羽目|はめ]}を[外|はず]して{konnichi:[今日|こんにち]}[御出|おいで]の、いずれも[様|さま]に、[上|あ]げねばならぬ、[売|う]らねばならぬと、[息|いき]せい[引|ひ]っぱり、{touhou:[東方世界|とうほうせかい]}の[薬|くすり]の{motojime:[元締|もとじ]め}、{yakushi:[薬師如来|やくしにょらい]}も{shouran:[照覧|しょうらん]}あれと、ホホを[敬|うやま]って、ういろうは、いらっしゃりませぬか。'
   ]}
 ];
 const PH = /\{(\w+)(?::([^}]+))?\}/g;
@@ -414,7 +439,7 @@ const BASE = {};
 ITEMS.forEach(([id,text,reading,phrase])=>{BASE[id]={id,text,reading,phrase};});
 
 function defaultState(){
-  return {sel:'ensai', cmp:'word', sec:0, items:{ensai:{drop:1, anchor:'関西', example:true}}, custom:[]};
+  return {sel:'ensai', cmp:'word', sec:0, ruby:true, items:{ensai:{drop:1, anchor:'関西', example:true}}, custom:[]};
 }
 let STATE = defaultState();
 const AUDIO = new Map();
@@ -810,14 +835,29 @@ function renderSecs(){
     return '<button type="button" class="sec'+(i===cur?' on':'')+'" data-act="sec" data-i="'+i+'" aria-pressed="'+(i===cur)+'"><span class="n">'+KANSUJI[i]+'</span>'+esc(s.label)+(done?'<span class="done">〇'+done+'</span>':'')+'</button>';
   }).join('');
 }
+const RUBY=/\[([^|\]]+)\|([^\]]+)\]/g;
+const rubyHTML = s => esc(s).replace(RUBY,'<ruby>$1<rt>$2</rt></ruby>');
+const plainText = s => String(s).replace(RUBY,'$1');
+function renderPara(p){
+  let out='', last=0;
+  for(const m of p.matchAll(PH)){
+    out+=rubyHTML(p.slice(last,m.index));
+    const id=m[1], shown=m[2], it=getItem(id);
+    if(!it){ out+=rubyHTML(shown||''); }
+    else{
+      const cls=['w']; if(AUDIO.has(keyOf(id,'word'))) cls.push('has'); if(it.grade) cls.push('g-'+it.grade); if(id===STATE.sel) cls.push('sel');
+      const label=shown||it.text;
+      out+='<button type="button" class="'+cls.join(' ')+'" data-act="sel" data-id="'+id+'" aria-label="'+esc(plainText(label))+'を練習する">'+rubyHTML(label)+'</button>';
+    }
+    last=m.index+m[0].length;
+  }
+  return '<p>'+out+rubyHTML(p.slice(last))+'</p>';
+}
 function renderPassage(){
-  const i=curSec();
-  $('passage').innerHTML = SECTIONS[i].paras.map(p=>'<p>'+p.replace(PH,(m,id,shown)=>{
-    const it=getItem(id); if(!it) return esc(shown||'');
-    const cls=['w']; if(AUDIO.has(keyOf(id,'word'))) cls.push('has'); if(it.grade) cls.push('g-'+it.grade); if(id===STATE.sel) cls.push('sel');
-    const label=shown||it.text;
-    return '<button type="button" class="'+cls.join(' ')+'" data-act="sel" data-id="'+id+'" aria-label="'+esc(label)+'を練習する">'+esc(label)+'</button>';
-  })+'</p>').join('');
+  const i=curSec(), ruby=STATE.ruby!==false;
+  $('passage').classList.toggle('noruby', !ruby);
+  const rb=$('ruby-btn'); rb.setAttribute('aria-pressed', String(ruby)); rb.textContent = ruby ? 'ルビを隠す' : 'ルビを出す';
+  $('passage').innerHTML = SECTIONS[i].paras.map(renderPara).join('');
   $('sec-nav').innerHTML =
     (i>0?'<button type="button" class="btn small" data-act="sec" data-i="'+(i-1)+'">← '+KANSUJI[i-1]+' '+esc(SECTIONS[i-1].label)+'</button>':'<span></span>')+
     (i<SECTIONS.length-1?'<button type="button" class="btn small" data-act="sec" data-i="'+(i+1)+'">'+KANSUJI[i+1]+' '+esc(SECTIONS[i+1].label)+' →</button>':'<span></span>');
@@ -917,6 +957,7 @@ document.addEventListener('click', e=>{
   const b=e.target.closest('[data-act]'); if(!b) return;
   const act=b.dataset.act, it=cur(), id=it.id;
   if(act==='sel'){ select(b.dataset.id); return; }
+  if(act==='ruby'){ STATE.ruby = (STATE.ruby===false); saveState(); renderPassage(); return; }
   if(act==='sec'){
     STATE.sec=parseInt(b.dataset.i,10)||0; saveState(); renderPassage();
     if(b.closest('#sec-nav')){ const reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches; $('h-text').scrollIntoView({behavior:reduce?'auto':'smooth', block:'start'}); }
