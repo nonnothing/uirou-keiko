@@ -64,6 +64,14 @@ section{margin-top:28px}
 .notice{margin-top:12px;padding:10px 12px;border-radius:10px;background:var(--warn-soft);color:var(--ink);font-size:14px;border:1px solid var(--line)}
 .notice strong{color:var(--warn)}
 .passage{font-family:var(--font-display);font-size:18px;line-height:2.15;display:grid;gap:12px}
+.secs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.sec{font:inherit;font-size:13.5px;line-height:1.3;padding:7px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;display:inline-flex;gap:6px;align-items:center}
+.sec .n{font-family:var(--font-display);color:var(--accent)}
+.sec .done{font-size:12px;color:var(--accent)}
+.sec.on{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.sec.on .n,.sec.on .done{color:var(--on-accent)}
+.sec:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.sec-nav{display:flex;justify-content:space-between;gap:8px;margin-top:12px}
 .w{font:inherit;color:inherit;background:none;border:0;padding:0 1px;margin:0;cursor:pointer;border-bottom:2px dotted var(--muted);border-radius:0;line-height:inherit}
 .w.has{border-bottom-style:solid}
 .w.g-x{border-bottom-color:var(--kaki)}
@@ -162,8 +170,10 @@ form.add{margin-top:14px;display:grid;gap:10px;grid-template-columns:repeat(auto
 
 <main>
   <section aria-labelledby="h-text">
-    <h2 id="h-text">本文（冒頭）</h2>
+    <h2 id="h-text">本文</h2>
+    <div id="secs" class="secs" aria-label="段を選ぶ"></div>
     <div id="passage" class="passage"></div>
+    <div id="sec-nav" class="sec-nav"></div>
     <div class="legend" aria-label="下線の意味">
       <span class="l0">未練習</span>
       <span style="--c:var(--kaki)">× まだ</span>
@@ -238,18 +248,173 @@ const ITEMS = [
   ['nise','似看板','にせかんばん','方々に似看板を出し'],
   ['haidawara','灰俵','はいだわら','灰俵の、さん俵の'],
   ['sumidawara','炭俵','すみだわら','炭俵のと'],
-  ['hiragana','平仮名','ひらがな','平仮名をもって']
+  ['hiragana','平仮名','ひらがな','平仮名をもって'],
+  ['atami','熱海','あたみ','熱海か塔ノ沢へ'],
+  ['tounosawa','塔ノ沢','とうのさわ','熱海か塔ノ沢へ'],
+  ['toujiyu','湯治','とうじ','湯治にお出でなさるるか'],
+  ['isesanguu','伊勢参宮','いせさんぐう','伊勢参宮の折からは'],
+  ['kadochigai','門違い','かどちがい','必ず門違いなされまするな'],
+  ['happou','八方','はっぽう','八方が八棟'],
+  ['yatsumune','八棟','やつむね','八方が八棟'],
+  ['mitsumune','三棟','みつむね','表が三棟玉堂造り'],
+  ['gyokudou','玉堂造り','ぎょくどうづくり','三棟玉堂造り'],
+  ['hafu','破風','はふ','破風には菊に'],
+  ['gomon','御紋','ごもん','桐のとうの御紋を'],
+  ['goshamen','御赦免','ごしゃめん','御紋を御赦免あって'],
+  ['keizu','系図','けいず','系図正しき薬でござる'],
+  ['saizen','最前','さいぜん','イヤ最前より'],
+  ['kamei','家名','かめい','家名の自慢ばかりを'],
+  ['shoushin','正身','しょうしん','正身の胡椒の丸呑み'],
+  ['koshou','胡椒','こしょう','正身の胡椒の丸呑み'],
+  ['marunomi','丸呑み','まるのみ','胡椒の丸呑み'],
+  ['shirakawa','白河夜船','しらかわよふね','白河夜船'],
+  ['ichiryuu','一粒','いちりゅう','さらば一粒食べかけて'],
+  ['kimiai','気見合い','きみあい','その気見合いをお目にかけましょう'],
+  ['hitotsubu','一粒','ひとつぶ','かように一粒舌の上に'],
+  ['fukunai','腹内','ふくない','腹内へ納めますると'],
+  ['kunpuu','薫風','くんぷう','薫風喉より来たり'],
+  ['nondo','喉','のんど','薫風喉より来たり'],
+  ['kouchuu','口中','こうちゅう','口中微涼を生ずるが如し'],
+  ['biryou','微涼','びりょう','口中微涼を生ずるが如し'],
+  ['gyochou','魚鳥','ぎょちょう','魚鳥、茸、麺類の'],
+  ['kinoko','茸','きのこ','魚鳥、茸、麺類の'],
+  ['menrui','麺類','めんるい','麺類の食合わせ'],
+  ['manbyou','万病','まんびょう','万病速効ある事'],
+  ['sokkou','速効','そっこう','万病速効ある事'],
+  ['kimyou','奇妙','きみょう','第一の奇妙には'],
+  ['zenigoma','銭ゴマ','ぜにごま','銭ゴマがはだしで逃げる'],
+  ['nodo','咽','のど','アワヤ咽'],
+  ['shion','歯音','しおん','カ牙サ歯音'],
+  ['kuchibiru','唇','くちびる','唇の軽重'],
+  ['keichou','軽重','けいちょう','唇の軽重'],
+  ['kaigou','開合','かいごう','開合さわやかに'],
+  ['bonmame','盆まめ','ぼんまめ','盆まめ、盆米、盆ごぼう'],
+  ['bongome','盆米','ぼんごめ','盆まめ、盆米、盆ごぼう'],
+  ['bongobou','盆ごぼう','ぼんごぼう','盆まめ、盆米、盆ごぼう'],
+  ['tsumitate','摘立','つみたて','摘立、摘豆、つみ山椒'],
+  ['tsumimame','摘豆','つみまめ','摘立、摘豆、つみ山椒'],
+  ['tsumizanshou','つみ山椒','つみざんしょう','摘立、摘豆、つみ山椒'],
+  ['shoshazan','書写山','しょしゃざん','書写山の社僧正'],
+  ['shasoujou','社僧正','しゃそうじょう','書写山の社僧正'],
+  ['kogome','粉米','こごめ','粉米のなまがみ'],
+  ['shusu','繻子','しゅす','繻子、繻珍'],
+  ['shuchin','繻珍','しゅちん','繻子、繻珍'],
+  ['kahee','嘉兵衛','かへえ','親も嘉兵衛、子も嘉兵衛'],
+  ['furukuri','古栗','ふるくり','古栗の木の古切口'],
+  ['furukirikuchi','古切口','ふるきりくち','古栗の木の古切口'],
+  ['amagappa','雨合羽','あまがっぱ','雨合羽か、番合羽か'],
+  ['bangappa','番合羽','ばんがっぱ','雨合羽か、番合羽か'],
+  ['kawagyahan','皮脚絆','かわぎゃはん','貴様のきゃはんも皮脚絆'],
+  ['mihari','三針','みはり','三針はりなかにちょと縫うて'],
+  ['nadeshiko','かわら撫子','かわらなでしこ','かわら撫子、野石竹'],
+  ['nosekichiku','野石竹','のせきちく','かわら撫子、野石竹'],
+  ['kobotoke','小仏','こぼとけ','一寸先のお小仏に'],
+  ['hosomizo','細溝','ほそみぞ','細溝にどじょにょろり'],
+  ['namadara','なま鱈','なまだら','京のなま鱈'],
+  ['managatsuo','真魚鰹','まながつお','奈良なま真魚鰹'],
+  ['shigokanme','四、五貫目','しごかんめ','ちょと四、五貫目'],
+  ['aodake','青竹','あおだけ','青竹茶せんで'],
+  ['chasen','茶せん','ちゃせん','青竹茶せんで'],
+  ['kouya','高野','こうや','高野の山の'],
+  ['kokera','こけら小僧','こけらこぞう','おこけら小僧'],
+  ['tanuki','狸','たぬき','狸百匹'],
+  ['tenmoku','天目','てんもく','天目百杯'],
+  ['bugu','武具','ぶぐ','武具、馬具'],
+  ['bagu','馬具','ばぐ','武具、馬具'],
+  ['nageshi','長押','なげし','あの長押の長薙刀は'],
+  ['naginata','長薙刀','ながなぎなた','あの長押の長薙刀は'],
+  ['gomagara','胡麻がら','ごまがら','向こうの胡麻がらは'],
+  ['magomagara','真胡麻殻','まごまがら','あれこそほんの真胡麻殻'],
+  ['kazaguruma','風車','かざぐるま','がらぴい風車'],
+  ['koboshi','小坊師','こぼし','おきゃがれ小坊師'],
+  ['icchoudako','一丁だこ','いっちょうだこ','たっぽたっぽの一丁だこ'],
+  ['gotoku','五徳','ごとく','五徳、鉄きゅう'],
+  ['tekkyuu','鉄きゅう','てっきゅう','五徳、鉄きゅう'],
+  ['kanakuma','かな熊童子','かなくまどうじ','かな熊童子に'],
+  ['ishikuma','石熊','いしくま','石熊、石持'],
+  ['ishimochi','石持','いしもち','石熊、石持'],
+  ['torakuma','虎熊','とらくま','虎熊、虎きす'],
+  ['torakisu','虎きす','とらぎす','虎熊、虎きす'],
+  ['toujitera','東寺','とうじ','東寺の羅生門には'],
+  ['rashoumon','羅生門','らしょうもん','東寺の羅生門には'],
+  ['ibaraki','茨城童子','いばらきどうじ','茨城童子がうで栗五合'],
+  ['raikou','頼光','らいこう','かの頼光のひざもと去らず'],
+  ['funa','鮒','ふな','鮒、きんかん、椎茸'],
+  ['kinkan','きんかん','きんかん','鮒、きんかん、椎茸'],
+  ['shiitake','椎茸','しいたけ','鮒、きんかん、椎茸'],
+  ['godan','後段','ごだん','定めて後段な'],
+  ['sobakiri','そば切り','そばきり','そば切り、そうめん'],
+  ['soumen','そうめん','そうめん','そば切り、そうめん'],
+  ['udon','うどん','うどん','うどんか、愚鈍な小新発知'],
+  ['gudon','愚鈍','ぐどん','うどんか、愚鈍な小新発知'],
+  ['koshinbochi','小新発知','こしんぼち','愚鈍な小新発知'],
+  ['kodana','小棚','こだな','小棚の小下の小桶に'],
+  ['koshita','小下','こした','小棚の小下の小桶に'],
+  ['kooke','小桶','こおけ','小棚の小下の小桶に'],
+  ['kojakushi','小杓子','こじゃくし','小杓子こ持って'],
+  ['gaten','合点','がてん','おっと合点だ'],
+  ['kawasaki','川崎','かわさき','心得たんぼの川崎'],
+  ['kanagawa','神奈川','かながわ','川崎、神奈川、程ヶ谷、戸塚は'],
+  ['hodogaya','程ヶ谷','ほどがや','川崎、神奈川、程ヶ谷、戸塚は'],
+  ['totsuka','戸塚','とつか','川崎、神奈川、程ヶ谷、戸塚は'],
+  ['yaito','やいと','やいと','やいとを擦りむく'],
+  ['sanri','三里','さんり','三里ばかりか'],
+  ['fujisawa','藤沢','ふじさわ','藤沢、平塚、大磯がしや'],
+  ['hiratsuka','平塚','ひらつか','藤沢、平塚、大磯がしや'],
+  ['ooiso','大磯','おおいそ','藤沢、平塚、大磯がしや'],
+  ['koiso','小磯','こいそ','小磯の宿を七つ起きして'],
+  ['souten','早天','そうてん','早天早々'],
+  ['kisen','貴賤群衆','きせんぐんじゅ','隠れござらぬ貴賤群衆の'],
+  ['hanauirou','花ういろう','はなういろう','花のお江戸の花ういろう'],
+  ['ubuko','産子','うぶこ','産子、這子に至るまで'],
+  ['houko','這子','ほうこ','産子、這子に至るまで'],
+  ['hyouban','評判','ひょうばん','この外郎のご評判'],
+  ['suribachi','すりばち','すりばち','臼、杵、すりばち'],
+  ['hame','羽目','はめ','羽目をはずして'],
+  ['touhou','東方世界','とうほうせかい','東方世界の薬の元締め'],
+  ['motojime','元締め','もとじめ','東方世界の薬の元締め'],
+  ['yakushi','薬師如来','やくしにょらい','薬師如来も照覧あれと'],
+  ['shouran','照覧','しょうらん','薬師如来も照覧あれと']
 ];
-const PASSAGE = [
-  '{sessha}{oyakata}と申すは、{otachiai}の中に、{gozonji}のお方も御座りましょうが、{oedo}を発って{nijuuri}{kamigata}、{soushuu}{odawara}{isshiki}をお過ぎなされて、{aomono}を登りへおいでなさるれば、{rankan}{toraya}{touemon}、只今は{teihatsu}致して、{ensai}となのりまする。',
-  '{gancho}より{omisoka}まで、お手に入れまする此の薬は、昔ちんの国の{toujin}、{uirou}という人、我が朝へ来たり、帝へ{sandai}の折から、この薬を深く籠め置き、用ゆる時は一粒ずつ、{kanmuri}のすき間より取り出す。依ってその名を帝より、{touchin}と賜る。即ち文字には、「頂き、透く、香い」と書いて「{touchin}」と申す。',
-  '只今はこの薬、殊の外{sejou}に弘まり、{houbou}に{nise}を出し、イヤ、{odawara}の、{haidawara}の、さん俵の、{sumidawara}のと、色々に申せども、{hiragana}をもって「ういろう」と記せしは、{oyakata}{ensai}ばかり。'
+const SECTIONS = [
+  {label:'拙者親方と', paras:[
+    '{sessha}{oyakata}と申すは、{otachiai}の中に、{gozonji}のお方も御座りましょうが、{oedo}を発って{nijuuri}{kamigata}、{soushuu}{odawara}{isshiki}をお過ぎなされて、{aomono}を登りへおいでなさるれば、{rankan}{toraya}{touemon}、只今は{teihatsu}致して、{ensai}となのりまする。',
+    '{gancho}より{omisoka}まで、お手に入れまする此の薬は、昔ちんの国の{toujin}、{uirou}という人、我が朝へ来たり、帝へ{sandai}の折から、この薬を深く籠め置き、用ゆる時は一粒ずつ、{kanmuri}のすき間より取り出す。依ってその名を帝より、{touchin}と賜る。即ち文字には、「頂き、透く、香い」と書いて「{touchin}」と申す。',
+    '只今はこの薬、殊の外{sejou}に弘まり、{houbou}に{nise}を出し、イヤ、{odawara}の、{haidawara}の、さん俵の、{sumidawara}のと、色々に申せども、{hiragana}をもって「ういろう」と記せしは、{oyakata}{ensai}ばかり。'
+  ]},
+  {label:'もしやお立ち会い', paras:[
+    'もしや{otachiai}の中に、{atami}か{tounosawa}へ{toujiyu}にお出でなさるるか、又は{isesanguu}の折からは、必ず{kadochigai}なされまするな。お登りならば右の方、お下りなれば左側、{happou}が{yatsumune}、表が{mitsumune}{gyokudou}、{hafu}には菊に桐のとうの{gomon}を{goshamen}あって、{keizu}正しき薬でござる。',
+    'イヤ{saizen}より{kamei}の自慢ばかりを申しても、{gozonji}ない方には、{shoushin}の{koshou}の{marunomi}、{shirakawa}、さらば{ichiryuu}食べかけて、その{kimiai}をお目にかけましょう。先ずこの薬をかように{hitotsubu}舌の上にのせまして、{fukunai}へ納めますると、イヤどうも云えぬは、胃、心、肺、肝がすこやかになりて、{kunpuu}{nondo}より来たり、{kouchuu}{biryou}を生ずるが如し、{gyochou}、{kinoko}、{menrui}の食合わせ、其の他、{manbyou}{sokkou}ある事神の如し。',
+    'さて、この薬、第一の{kimyou}には、舌のまわることが、{zenigoma}がはだしで逃げる。ひょっと舌がまわり出すと、矢も盾もたまらぬじゃ。そりゃそら、そらそりゃ、まわってきたわ、まわってくるわ。'
+  ]},
+  {label:'アワヤ咽', paras:[
+    'アワヤ{nodo}、さたらな舌にカ牙サ{shion}、ハマの二つは{kuchibiru}の{keichou}、{kaigou}さわやかに、あかさたなはまやらわ、おこそとのほもよろを、一つへぎへぎに、へぎほしはじかみ、{bonmame}、{bongome}、{bongobou}、{tsumitate}、{tsumimame}、{tsumizanshou}、{shoshazan}の{shasoujou}、{kogome}のなまがみ、{kogome}のなまがみ、こん粉米の小生がみ、',
+    '{shusu}ひじゅす、{shusu}、{shuchin}、親も{kahee}、子も{kahee}、親かへい子かへい、子かへい親かへい、{furukuri}の木の{furukirikuchi}。{amagappa}か、{bangappa}か、貴様のきゃはんも{kawagyahan}、我等がきゃはんも{kawagyahan}、しっかわ袴のしっぽころびを、{mihari}はりなかにちょと縫うて、ぬうてちょとぶんだせ、{nadeshiko}、{nosekichiku}。のら如来、のら如来、三のら如来に六のら如来。一寸先のお{kobotoke}におけつまずきゃるな、{hosomizo}にどじょにょろり。'
+  ]},
+  {label:'京のなま鱈', paras:[
+    '京の{namadara}、奈良なま{managatsuo}、ちょと{shigokanme}、お茶立ちょ、茶立ちょ、ちゃっと立ちょ、茶立ちょ、{aodake}{chasen}でお茶ちゃと立ちゃ。',
+    '来るは来るは何が来る、{kouya}の山のお{kokera}。{tanuki}百匹、箸百膳、{tenmoku}百杯、棒八百本。{bugu}、{bagu}、ぶぐ、ばぐ、三ぶぐばぐ、合わせて{bugu}、{bagu}、六ぶぐばぐ。菊、栗、きく、くり、三菊栗、合わせて菊栗六菊栗、麦、ごみ、むぎ、ごみ、三むぎごみ、合わせてむぎ、ごみ、六むぎごみ。',
+    'あの{nageshi}の{naginata}は、誰が{naginata}ぞ。向こうの{gomagara}は、えのごまがらか、あれこそほんの{magomagara}。がらぴい、がらぴい{kazaguruma}、おきゃがれこぼし、おきゃがれ{koboshi}、ゆんべもこぼして又こぼした。',
+    'たあぷぽぽ、たあぷぽぽ、ちりから、ちりから、つったっぽ、たっぽたっぽの{icchoudako}、落ちたら煮て食お、煮ても焼いても食われぬものは、{gotoku}、{tekkyuu}、{kanakuma}に、{ishikuma}、{ishimochi}、{torakuma}、{torakisu}、中にも、{toujitera}の{rashoumon}には、{ibaraki}がうで栗五合つかんでおむしゃる、かの{raikou}のひざもと去らず。',
+    '{funa}、{kinkan}、{shiitake}、定めて{godan}な、{sobakiri}、{soumen}、{udon}か、{gudon}な{koshinbochi}、'
+  ]},
+  {label:'小棚の小下の', paras:[
+    '{kodana}の{koshita}の{kooke}に、こ味噌がこ有るぞ、{kojakushi}こ持って、こすくってこよこせ、おっと{gaten}だ、心得たんぼの{kawasaki}、{kanagawa}、{hodogaya}、{totsuka}は、走って行けば、{yaito}を擦りむく、{sanri}ばかりか、{fujisawa}、{hiratsuka}、{ooiso}がしや、{koiso}の宿を七つ起きして、{souten}早々、{soushuu}{odawara}{touchin:とうちん香}、'
+  ]},
+  {label:'隠れござらぬ', paras:[
+    '隠れござらぬ{kisen}の、花の{oedo:お江戸}の{hanauirou}。あれあの花を見てお心をおやわらぎやという。{ubuko}、{houko}に至るまで、この{uirou}のご{hyouban}、ご存じないとは申されまいまいつぶり、角出せ、棒出せ、ぼうぼうまゆに、臼、杵、{suribachi}、ばちばちぐわらぐわらぐわらと、{hame}をはずして今日お出でのいずれも様に、上げねばならぬ、売らねばならぬと息せい引っぱり、{touhou}の薬の{motojime}、{yakushi}も{shouran}あれと、ホホ敬って、ういろうは、いらっしゃりませぬか。'
+  ]}
 ];
+const PH = /\{(\w+)(?::([^}]+))?\}/g;
+const ITEM_SEC = {};
+SECTIONS.forEach((s,i)=>s.paras.forEach(p=>{ for(const m of p.matchAll(PH)){ if(!(m[1] in ITEM_SEC)) ITEM_SEC[m[1]]=i; } }));
+const secHas = (i,id) => SECTIONS[i] && SECTIONS[i].paras.some(p=>p.includes('{'+id+'}')||p.includes('{'+id+':'));
+const KANSUJI = ['一','二','三','四','五','六','七','八'];
 const BASE = {};
 ITEMS.forEach(([id,text,reading,phrase])=>{BASE[id]={id,text,reading,phrase};});
 
 function defaultState(){
-  return {sel:'ensai', cmp:'word', items:{ensai:{drop:1, anchor:'関西', example:true}}, custom:[]};
+  return {sel:'ensai', cmp:'word', sec:0, items:{ensai:{drop:1, anchor:'関西', example:true}}, custom:[]};
 }
 let STATE = defaultState();
 const AUDIO = new Map();
@@ -636,12 +801,27 @@ function renderNotices(){
   if(!persistent) h+='<p class="notice"><strong>この画面では録音を保存できません。</strong>閉じると消えるので、残したいときは下の「書き出す」を使ってください。</p>';
   $('notices').innerHTML=h;
 }
+function curSec(){ const i=STATE.sec|0; return (i>=0 && i<SECTIONS.length) ? i : 0; }
+function renderSecs(){
+  const cur=curSec();
+  $('secs').innerHTML = SECTIONS.map((s,i)=>{
+    const ids=[...new Set(s.paras.flatMap(p=>[...p.matchAll(PH)].map(m=>m[1])))];
+    const done=ids.filter(id=>getItem(id)&&getItem(id).grade==='o').length;
+    return '<button type="button" class="sec'+(i===cur?' on':'')+'" data-act="sec" data-i="'+i+'" aria-pressed="'+(i===cur)+'"><span class="n">'+KANSUJI[i]+'</span>'+esc(s.label)+(done?'<span class="done">〇'+done+'</span>':'')+'</button>';
+  }).join('');
+}
 function renderPassage(){
-  $('passage').innerHTML = PASSAGE.map(p=>'<p>'+p.replace(/\{(\w+)\}/g,(m,id)=>{
-    const it=getItem(id); if(!it) return '';
+  const i=curSec();
+  $('passage').innerHTML = SECTIONS[i].paras.map(p=>'<p>'+p.replace(PH,(m,id,shown)=>{
+    const it=getItem(id); if(!it) return esc(shown||'');
     const cls=['w']; if(AUDIO.has(keyOf(id,'word'))) cls.push('has'); if(it.grade) cls.push('g-'+it.grade); if(id===STATE.sel) cls.push('sel');
-    return '<button type="button" class="'+cls.join(' ')+'" data-act="sel" data-id="'+id+'" aria-label="'+esc(it.text)+'を練習する">'+esc(it.text)+'</button>';
+    const label=shown||it.text;
+    return '<button type="button" class="'+cls.join(' ')+'" data-act="sel" data-id="'+id+'" aria-label="'+esc(label)+'を練習する">'+esc(label)+'</button>';
   })+'</p>').join('');
+  $('sec-nav').innerHTML =
+    (i>0?'<button type="button" class="btn small" data-act="sec" data-i="'+(i-1)+'">← '+KANSUJI[i-1]+' '+esc(SECTIONS[i-1].label)+'</button>':'<span></span>')+
+    (i<SECTIONS.length-1?'<button type="button" class="btn small" data-act="sec" data-i="'+(i+1)+'">'+KANSUJI[i+1]+' '+esc(SECTIONS[i+1].label)+' →</button>':'<span></span>');
+  renderSecs();
 }
 function renderCard(){
   const it=cur(), mor=morae(it.reading), n=mor.length, id=it.id;
@@ -726,6 +906,7 @@ function select(id){
   if(!getItem(id)) return;
   STATE.sel=id;
   if(!STATE.items[id]) STATE.items[id]={};
+  if(id in ITEM_SEC && !secHas(curSec(), id)) STATE.sec=ITEM_SEC[id];
   saveState(); renderAll();
   const reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   $('card-sec').scrollIntoView({behavior:reduce?'auto':'smooth', block:'start'});
@@ -736,6 +917,11 @@ document.addEventListener('click', e=>{
   const b=e.target.closest('[data-act]'); if(!b) return;
   const act=b.dataset.act, it=cur(), id=it.id;
   if(act==='sel'){ select(b.dataset.id); return; }
+  if(act==='sec'){
+    STATE.sec=parseInt(b.dataset.i,10)||0; saveState(); renderPassage();
+    if(b.closest('#sec-nav')){ const reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches; $('h-text').scrollIntoView({behavior:reduce?'auto':'smooth', block:'start'}); }
+    return;
+  }
   if(act==='rec'){
     const key=keyOf(id,b.dataset.slot);
     if(rec){ stopRec(); return; }
