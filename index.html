@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>外郎売アクセント稽古帳</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=Shippori+Mincho:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* layout: one narrow column — passage, then the selected word's card, then the practice list */
+  --bg:#F2F4F1; --surface:#FFFFFF; --ink:#1C2320; --muted:#57615B; --line:#D5DAD4;
+  --accent:#2C694C; --accent-soft:#E1EEE6; --on-accent:#FFFFFF;
+  --kaki:#B14F28; --kaki-soft:#F7E4D9;
+  --warn:#8F5E00; --warn-soft:#F5EAD0;
+  --self:#3956A5; --self-soft:#E3E8F6;
+  --maku-1:#1C2320; --maku-2:#B14F28; --maku-3:#2C694C;
+  --font-display:"Shippori Mincho","Hiragino Mincho ProN","Yu Mincho",serif;
+  --font-body:"BIZ UDPGothic","Hiragino Sans","Yu Gothic UI","Meiryo",system-ui,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#141816; --surface:#1D2220; --ink:#E6EBE7; --muted:#A2ACA6; --line:#343B37;
+    --accent:#7CC3A0; --accent-soft:#213429; --on-accent:#0F241A;
+    --kaki:#E88B60; --kaki-soft:#3B261C;
+    --warn:#E2B55C; --warn-soft:#382F1D;
+    --self:#93ABEF; --self-soft:#232B42;
+    --maku-1:#0B0D0C; --maku-2:#C9673E; --maku-3:#4F9A76;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#141816; --surface:#1D2220; --ink:#E6EBE7; --muted:#A2ACA6; --line:#343B37;
+  --accent:#7CC3A0; --accent-soft:#213429; --on-accent:#0F241A;
+  --kaki:#E88B60; --kaki-soft:#3B261C;
+  --warn:#E2B55C; --warn-soft:#382F1D;
+  --self:#93ABEF; --self-soft:#232B42;
+  --maku-1:#0B0D0C; --maku-2:#C9673E; --maku-3:#4F9A76;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.7}
+.wrap{max-width:680px;margin:0 auto;padding:0 16px 96px}
+.maku{display:flex;height:8px}
+.maku span{flex:1}
+.maku span:nth-child(1){background:var(--maku-1)}
+.maku span:nth-child(2){background:var(--maku-2)}
+.maku span:nth-child(3){background:var(--maku-3)}
+header{padding:24px 0 8px}
+h1{font-family:var(--font-display);font-weight:500;font-size:28px;line-height:1.35;margin:0 0 6px;text-wrap:balance}
+h2{font-family:var(--font-display);font-weight:500;font-size:20px;margin:0 0 10px;text-wrap:balance}
+h3{font-size:15px;font-weight:700;margin:0 0 6px;display:flex;gap:8px;align-items:baseline}
+h3 .no,.howto b{font-family:var(--font-display);font-weight:500;color:var(--accent);font-size:13px;width:22px;height:22px;border:1px solid var(--accent);border-radius:4px;display:inline-grid;place-items:center;flex:none;line-height:1}
+h3{align-items:center}
+p{margin:0}
+.lede{color:var(--muted);font-size:15px;max-width:38em}
+.howto{margin:12px 0 0;padding:0;list-style:none;display:grid;gap:4px;font-size:14px;color:var(--muted)}
+.howto li{display:grid;grid-template-columns:22px 1fr;gap:8px;align-items:start}
+.howto b{margin-top:2px}
+section{margin-top:28px}
+.notice{margin-top:12px;padding:10px 12px;border-radius:10px;background:var(--warn-soft);color:var(--ink);font-size:14px;border:1px solid var(--line)}
+.notice strong{color:var(--warn)}
+.passage{font-family:var(--font-display);font-size:18px;line-height:2.15;display:grid;gap:12px}
+.w{font:inherit;color:inherit;background:none;border:0;padding:0 1px;margin:0;cursor:pointer;border-bottom:2px dotted var(--muted);border-radius:0;line-height:inherit}
+.w.has{border-bottom-style:solid}
+.w.g-x{border-bottom-color:var(--kaki)}
+.w.g-s{border-bottom-color:var(--warn)}
+.w.g-o{border-bottom-color:var(--accent)}
+.w.sel{background:var(--accent-soft)}
+.w:focus-visible,.btn:focus-visible,.row:focus-visible,.mora:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:10px;font-size:13px;color:var(--muted)}
+.legend span::before{content:"";display:inline-block;width:18px;height:0;border-bottom:2px solid var(--c,var(--muted));margin-right:6px;vertical-align:middle}
+.legend .l0::before{border-bottom-style:dotted}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px 16px;display:grid;gap:22px}
+.card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.eyebrow{font-size:12px;color:var(--muted)}
+.word{font-family:var(--font-display);font-weight:500;font-size:32px;line-height:1.2;margin:2px 0 0}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+label.f{display:grid;gap:2px;font-size:13px;color:var(--muted)}
+input[type=text]{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:7px 10px;min-height:40px;width:100%}
+.hint{font-size:13.5px;color:var(--muted);margin-bottom:10px;max-width:40em}
+.slots{display:grid;gap:10px}
+.slot{display:grid;grid-template-columns:minmax(0,9.5em) minmax(0,1fr);gap:8px 12px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.slot:first-child{border-top:0;padding-top:0}
+.slot .name{font-size:14px;font-weight:700}
+.slot .meta{display:block;font-weight:400;font-size:12px;color:var(--muted)}
+.ctrls{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.btn{font:inherit;font-size:14.5px;min-height:40px;padding:0 13px;border-radius:9px;border:1px solid var(--line);background:var(--surface);color:var(--ink);display:inline-flex;align-items:center;gap:6px;cursor:pointer;line-height:1.2}
+.btn:hover{border-color:var(--muted)}
+.btn:active{transform:translateY(1px)}
+.btn .dot{width:10px;height:10px;border-radius:50%;background:var(--kaki);flex:none}
+.btn .tri{width:0;height:0;border-left:9px solid currentColor;border-top:6px solid transparent;border-bottom:6px solid transparent;flex:none}
+.btn.recording{border-color:var(--kaki);color:var(--kaki);background:var(--kaki-soft)}
+.btn.recording .dot{animation:pulse 1s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.25}}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn.small{min-height:34px;font-size:13.5px;padding:0 10px}
+.pattern{display:grid;gap:10px}
+.pattern svg{display:block;max-width:100%;height:auto}
+.mora-row{display:flex;flex-wrap:wrap;gap:6px}
+.mora{font:inherit;font-family:var(--font-display);font-size:18px;min-width:44px;min-height:44px;border-radius:9px;border:1px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer}
+.mora.on{border-color:var(--kaki);background:var(--kaki-soft);color:var(--kaki)}
+.typename{font-size:14px}
+.typename b{font-weight:700}
+.example{font-size:13px;color:var(--warn);background:var(--warn-soft);padding:6px 10px;border-radius:8px}
+ol.steps{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+ol.steps li{display:grid;grid-template-columns:30px minmax(0,1fr);gap:10px;align-items:start}
+.step-no{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--accent);color:var(--accent);display:grid;place-items:center;font-family:var(--font-display);font-size:15px}
+.step-t{font-weight:700;font-size:15px}
+.step-d{font-size:13.5px;color:var(--muted);margin:2px 0 8px}
+.graph{border:1px solid var(--line);border-radius:10px;background:var(--bg);padding:8px}
+.graph canvas{display:block;width:100%;height:190px}
+.glegend{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin-top:6px}
+.glegend span::before{content:"";display:inline-block;width:20px;height:3px;border-radius:2px;background:var(--c);margin-right:6px;vertical-align:middle}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.seg label{font-size:13.5px;padding:6px 12px;cursor:pointer;display:flex;align-items:center;gap:4px}
+.seg input{accent-color:var(--accent)}
+.grades{display:flex;flex-wrap:wrap;gap:8px}
+.grades .btn{min-width:96px;justify-content:center}
+.grades .btn.on.g-o{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.grades .btn.on.g-s{background:var(--warn-soft);border-color:var(--warn);color:var(--warn)}
+.grades .btn.on.g-x{background:var(--kaki-soft);border-color:var(--kaki);color:var(--kaki)}
+.pill{display:inline-block;font-size:12px;line-height:1.5;padding:1px 9px;border-radius:999px;background:var(--bg);color:var(--muted);border:1px solid var(--line);white-space:nowrap}
+.pill.g-o{background:var(--accent-soft);color:var(--accent);border-color:transparent}
+.pill.g-s{background:var(--warn-soft);color:var(--warn);border-color:transparent}
+.pill.g-x{background:var(--kaki-soft);color:var(--kaki);border-color:transparent}
+.pill.rec{background:var(--self-soft);color:var(--self);border-color:transparent}
+.list{display:grid;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--surface)}
+.row{font:inherit;color:inherit;text-align:left;background:none;border:0;border-top:1px solid var(--line);padding:11px 14px;display:flex;flex-wrap:wrap;gap:4px 12px;align-items:center;cursor:pointer;width:100%}
+.row:first-child{border-top:0}
+.row.sel{background:var(--accent-soft)}
+.row .rw{font-family:var(--font-display);font-size:18px}
+.row .rr{font-size:13px;color:var(--muted)}
+.row .pills{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+.empty{padding:14px;color:var(--muted);font-size:14px}
+form.add{margin-top:14px;display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));align-items:end}
+.err{color:var(--kaki);font-size:13px;min-height:1em}
+.data-btns{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+#toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);max-width:min(560px,calc(100% - 32px));background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:10px;font-size:14px;line-height:1.5;opacity:0;pointer-events:none;transition:opacity .2s}
+#toast.show{opacity:1}
+@media (prefers-reduced-motion: reduce){.btn.recording .dot{animation:none}#toast{transition:none}}
+@media (max-width:420px){.slot{grid-template-columns:1fr}.word{font-size:28px}}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+</style>
+</head>
+<body>
+<div class="maku" aria-hidden="true"><span></span><span></span><span></span></div>
+<div class="wrap">
+<header>
+  <h1>外郎売アクセント稽古帳</h1>
+  <p class="lede">聞き分けはできるのに、言おうとすると形が崩れる。そんな語を、お手本の吹き込みと段階練習で言えるようにするための試作です。</p>
+  <ol class="howto">
+    <li><b>一</b><span>本文の下線の語をタップして、練習する語を選ぶ</span></li>
+    <li><b>二</b><span>指導する人がお手本を吹き込み、下がる場所をタップで付ける</span></li>
+    <li><b>三</b><span>段階練習のあと自分の声を録り、声の高さの線を見比べて〇△×を付ける</span></li>
+  </ol>
+  <div id="notices"></div>
+</header>
+
+<main>
+  <section aria-labelledby="h-text">
+    <h2 id="h-text">本文（冒頭）</h2>
+    <div id="passage" class="passage"></div>
+    <div class="legend" aria-label="下線の意味">
+      <span class="l0">未練習</span>
+      <span style="--c:var(--kaki)">× まだ</span>
+      <span style="--c:var(--warn)">△ おしい</span>
+      <span style="--c:var(--accent)">〇 言えた</span>
+      <span>実線はお手本あり</span>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-card" id="card-sec">
+    <h2 id="h-card" class="sr">練習カード</h2>
+    <div id="card" class="card"></div>
+  </section>
+
+  <section aria-labelledby="h-list">
+    <h2 id="h-list">練習中の語</h2>
+    <div id="list" class="list"></div>
+    <form class="add" id="add-form" novalidate>
+      <label class="f" for="a-text">本文にない語や句を足す
+        <input type="text" id="a-text" placeholder="欄干橋虎屋">
+      </label>
+      <label class="f" for="a-reading">読み（ひらがな）
+        <input type="text" id="a-reading" placeholder="らんかんばしとらや">
+      </label>
+      <button class="btn" type="submit">足す</button>
+      <p class="err" id="a-err" role="alert"></p>
+    </form>
+  </section>
+
+  <section aria-labelledby="h-data">
+    <h2 id="h-data">録音の保存と受け渡し</h2>
+    <p class="hint" id="storage-status"></p>
+    <div class="data-btns">
+      <button class="btn" data-act="export" type="button">書き出す（.json）</button>
+      <button class="btn" data-act="import" type="button">読み込む</button>
+    </div>
+    <p class="hint">自分のスマホで吹き込んだお手本を、練習する人のスマホへ渡すときに使います。書き出したファイルをLINEやメールで送り、相手のスマホで「読み込む」を押します。</p>
+  </section>
+</main>
+</div>
+<input type="file" id="file-audio" accept="audio/*" hidden>
+<input type="file" id="file-import" accept="application/json,.json" hidden>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const ITEMS = [
+  ['sessha','拙者','せっしゃ','拙者親方と申すは'],
+  ['oyakata','親方','おやかた','拙者親方と申すは'],
+  ['otachiai','お立ち会い','おたちあい','お立ち会いの中に'],
+  ['gozonji','御存知','ごぞんじ','御存知のお方も'],
+  ['oedo','御江戸','おえど','御江戸を発って'],
+  ['nijuuri','二十里','にじゅうり','二十里上方'],
+  ['kamigata','上方','かみがた','二十里上方'],
+  ['soushuu','相州','そうしゅう','相州小田原'],
+  ['odawara','小田原','おだわら','相州小田原一色町を'],
+  ['isshiki','一色町','いっしきまち','小田原一色町を'],
+  ['aomono','青物町','あおものちょう','青物町を登りへ'],
+  ['rankan','欄干橋','らんかんばし','欄干橋虎屋藤衛門'],
+  ['toraya','虎屋','とらや','虎屋藤衛門'],
+  ['touemon','藤衛門','とうえもん','虎屋藤衛門'],
+  ['teihatsu','剃髪','ていはつ','剃髪致して'],
+  ['ensai','円斎','えんさい','円斎となのりまする'],
+  ['gancho','元朝','がんちょう','元朝より大晦日まで'],
+  ['omisoka','大晦日','おおつごもり','元朝より大晦日まで'],
+  ['toujin','唐人','とうじん','ちんの国の唐人'],
+  ['uirou','外郎','ういろう','外郎という人'],
+  ['sandai','参内','さんだい','帝へ参内の折から'],
+  ['kanmuri','冠','かんむり','冠のすき間より'],
+  ['touchin','とうちんこう','とうちんこう','とうちんこうと賜る'],
+  ['sejou','世上','せじょう','殊の外世上に弘まり'],
+  ['houbou','方々','ほうぼう','方々に似看板を出し'],
+  ['nise','似看板','にせかんばん','方々に似看板を出し'],
+  ['haidawara','灰俵','はいだわら','灰俵の、さん俵の'],
+  ['sumidawara','炭俵','すみだわら','炭俵のと'],
+  ['hiragana','平仮名','ひらがな','平仮名をもって']
+];
+const PASSAGE = [
+  '{sessha}{oyakata}と申すは、{otachiai}の中に、{gozonji}のお方も御座りましょうが、{oedo}を発って{nijuuri}{kamigata}、{soushuu}{odawara}{isshiki}をお過ぎなされて、{aomono}を登りへおいでなさるれば、{rankan}{toraya}{touemon}、只今は{teihatsu}致して、{ensai}となのりまする。',
+  '{gancho}より{omisoka}まで、お手に入れまする此の薬は、昔ちんの国の{toujin}、{uirou}という人、我が朝へ来たり、帝へ{sandai}の折から、この薬を深く籠め置き、用ゆる時は一粒ずつ、{kanmuri}のすき間より取り出す。依ってその名を帝より、{touchin}と賜る。即ち文字には、「頂き、透く、香い」と書いて「{touchin}」と申す。',
+  '只今はこの薬、殊の外{sejou}に弘まり、{houbou}に{nise}を出し、イヤ、{odawara}の、{haidawara}の、さん俵の、{sumidawara}のと、色々に申せども、{hiragana}をもって「ういろう」と記せしは、{oyakata}{ensai}ばかり。'
+];
+const BASE = {};
+ITEMS.forEach(([id,text,reading,phrase])=>{BASE[id]={id,text,reading,phrase};});
+
+function defaultState(){
+  return {sel:'ensai', cmp:'word', items:{ensai:{drop:1, anchor:'関西', example:true}}, custom:[]};
+}
+let STATE = defaultState();
+const AUDIO = new Map();
+const CONTOUR = new Map();
+let db = null, persistent = false;
+let rec = null;
+let micState = 'unknown';
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s??'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const sleep = ms => new Promise(r=>setTimeout(r,ms));
+
+function toast(msg){
+  const t=$('toast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(toast.timer); toast.timer=setTimeout(()=>t.classList.remove('show'), 5200);
+}
+
+function idbOpen(){
+  return new Promise((res,rej)=>{
+    try{
+      const r=indexedDB.open('uirou-keiko',1);
+      r.onupgradeneeded=()=>{const d=r.result; d.createObjectStore('kv'); d.createObjectStore('audio');};
+      r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error);
+    }catch(e){rej(e);}
+  });
+}
+function idbReq(store, mode, fn){
+  return new Promise((res,rej)=>{
+    try{
+      const tx=db.transaction(store,mode); const req=fn(tx.objectStore(store));
+      tx.oncomplete=()=>res(req?req.result:undefined); tx.onerror=()=>rej(tx.error); tx.onabort=()=>rej(tx.error);
+    }catch(e){rej(e);}
+  });
+}
+async function idbPut(store,key,val){ if(!db) return; try{ await idbReq(store,'readwrite',s=>s.put(val,key)); }catch(e){} }
+async function idbGet(store,key){ if(!db) return undefined; return idbReq(store,'readonly',s=>s.get(key)); }
+async function loadAllAudio(){
+  if(!db) return;
+  const keys=await idbReq('audio','readonly',s=>s.getAllKeys());
+  const vals=await idbReq('audio','readonly',s=>s.getAll());
+  keys.forEach((k,i)=>{ if(vals[i]&&vals[i].buf) AUDIO.set(k, vals[i]); });
+}
+function saveState(){ idbPut('kv','state', JSON.parse(JSON.stringify(STATE))); }
+
+function getItem(id){
+  const base = BASE[id] || STATE.custom.find(c=>c.id===id);
+  if(!base) return null;
+  const st = STATE.items[id] || {};
+  return {id, text:base.text, reading: st.reading ?? base.reading, phrase: st.phrase ?? base.phrase ?? '',
+    drop: (st.drop===undefined ? null : st.drop), anchor: st.anchor ?? '', grade: st.grade || null,
+    gradedAt: st.gradedAt || null, example: !!st.example};
+}
+function setItem(id, patch){
+  STATE.items[id] = Object.assign({}, STATE.items[id]||{}, patch);
+  saveState();
+}
+const cur = () => getItem(STATE.sel) || getItem('ensai');
+const keyOf = (id,slot) => id+'|'+slot;
+
+const SMALL='ぁぃぅぇぉゃゅょゎァィゥェォャュョヮ';
+function toKata(s){ return s.replace(/[ぁ-ゖ]/g, c=>String.fromCharCode(c.charCodeAt(0)+0x60)); }
+function morae(r){
+  const out=[];
+  for(const ch of toKata(String(r||'').replace(/\s/g,''))){
+    if(SMALL.includes(ch) && out.length) out[out.length-1]+=ch; else out.push(ch);
+  }
+  return out;
+}
+function pitchPattern(d,n){
+  const a=[];
+  for(let i=0;i<n;i++){
+    let h;
+    if(d===1) h=(i===0);
+    else if(i===0) h=false;
+    else if(d===0) h=true;
+    else h=(i<d);
+    a.push(h?'H':'L');
+  }
+  return {mora:a, particle: d===0 ? 'H' : 'L'};
+}
+function typeName(d,n){
+  if(d===null) return '未設定';
+  if(d===0) return '平板型［0］';
+  if(d===1) return '頭高型［1］';
+  if(d===n) return '尾高型［'+d+'］';
+  return '中高型［'+d+'］';
+}
+
+function patternSVG(mor, d){
+  const n=mor.length, step=48, x0=28, H=22, L=62, w=x0*2+step*n;
+  const css = v => 'style="'+v+'"';
+  let s='<svg viewBox="0 0 '+w+' 100" width="'+w+'" role="img" aria-label="'+esc(mor.join('')+' の高低：'+typeName(d,n))+'">';
+  const xs = i => x0+i*step;
+  if(d===null){
+    mor.forEach((m,i)=>{ s+='<circle cx="'+xs(i)+'" cy="42" r="5" fill="none" '+css('stroke:var(--muted)')+' stroke-width="1.5"/>'; });
+  }else{
+    const {mora, particle}=pitchPattern(d,n);
+    const pts=mora.map((p,i)=>[xs(i), p==='H'?H:L]);
+    const pp=[xs(n), particle==='H'?H:L];
+    for(let i=0;i<pts.length-1;i++){
+      const drop = pts[i][1]===H && pts[i+1][1]===L;
+      s+='<line x1="'+pts[i][0]+'" y1="'+pts[i][1]+'" x2="'+pts[i+1][0]+'" y2="'+pts[i+1][1]+'" '+css('stroke:'+(drop?'var(--kaki)':'var(--accent)'))+' stroke-width="'+(drop?4:2.5)+'" stroke-linecap="round"/>';
+    }
+    const last=pts[pts.length-1]; const dropP = last[1]===H && pp[1]===L;
+    s+='<line x1="'+last[0]+'" y1="'+last[1]+'" x2="'+pp[0]+'" y2="'+pp[1]+'" '+css('stroke:'+(dropP?'var(--kaki)':'var(--muted)'))+' stroke-width="'+(dropP?4:2)+'" stroke-dasharray="'+(dropP?'0':'4 4')+'" stroke-linecap="round"/>';
+    pts.forEach(p=>{ s+='<circle cx="'+p[0]+'" cy="'+p[1]+'" r="6.5" '+css('fill:var(--accent)')+'/>'; });
+    s+='<circle cx="'+pp[0]+'" cy="'+pp[1]+'" r="5.5" fill="none" '+css('stroke:var(--muted)')+' stroke-width="1.5"/>';
+  }
+  mor.forEach((m,i)=>{ s+='<text x="'+xs(i)+'" y="94" text-anchor="middle" font-size="17" '+css('fill:var(--ink);font-family:var(--font-display)')+'>'+esc(m)+'</text>'; });
+  s+='<text x="'+xs(n)+'" y="94" text-anchor="middle" font-size="14" '+css('fill:var(--muted)')+'>が</text>';
+  return s+'</svg>';
+}
+
+let actx=null;
+function hum(d,n,slow){
+  const AC=window.AudioContext||window.webkitAudioContext;
+  if(!AC){ toast('この端末では音を作れませんでした。'); return; }
+  actx = actx || new AC();
+  if(actx.state==='suspended') actx.resume();
+  const {mora, particle}=pitchPattern(d,n);
+  const pat=[...mora, particle];
+  const dur=slow?0.42:0.22, Hf=233, Lf=175, V=0.2;
+  const t=actx.currentTime+0.05;
+  const o=actx.createOscillator(), f=actx.createBiquadFilter(), g=actx.createGain();
+  o.type='sawtooth'; f.type='lowpass'; f.frequency.value=900;
+  o.connect(f); f.connect(g); g.connect(actx.destination);
+  o.frequency.setValueAtTime(pat[0]==='H'?Hf:Lf, t);
+  g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(V,t+0.03);
+  for(let i=1;i<pat.length;i++){
+    const b=t+i*dur;
+    o.frequency.setTargetAtTime(pat[i]==='H'?Hf:Lf, b, 0.012);
+    g.gain.setValueAtTime(V,b-0.025); g.gain.linearRampToValueAtTime(V*0.45,b); g.gain.linearRampToValueAtTime(V,b+0.03);
+  }
+  const e=t+pat.length*dur;
+  g.gain.setValueAtTime(V,e-0.06); g.gain.linearRampToValueAtTime(0,e);
+  o.start(t); o.stop(e+0.05);
+}
+
+const player = new Audio();
+player.preload='auto';
+let playToken=0, playerURL=null;
+function playKey(key, rate){
+  const a=AUDIO.get(key);
+  if(!a) return Promise.resolve(false);
+  return new Promise(res=>{
+    const tok=++playToken;
+    try{ player.pause(); }catch(e){}
+    if(playerURL){ try{URL.revokeObjectURL(playerURL);}catch(e){} }
+    playerURL=URL.createObjectURL(new Blob([a.buf],{type:a.type}));
+    player.src=playerURL;
+    player.defaultPlaybackRate=rate||1; player.playbackRate=rate||1;
+    player.preservesPitch=true; player.webkitPreservesPitch=true; player.mozPreservesPitch=true;
+    const done=()=>{player.onended=null; player.onerror=null; res(tok===playToken);};
+    player.onended=done; player.onerror=()=>{ toast('この録音は再生できませんでした。'); done(); };
+    const p=player.play();
+    if(p&&p.catch) p.catch(()=>{ toast('再生できませんでした。もう一度タップしてください。'); done(); });
+  });
+}
+async function chain(keys, gap){
+  for(let i=0;i<keys.length;i++){
+    const ok=await playKey(keys[i],1);
+    if(!ok) return;
+    if(i<keys.length-1) await sleep(gap||450);
+  }
+}
+
+function policyAllowsMic(){
+  try{
+    const fp=document.permissionsPolicy||document.featurePolicy;
+    if(fp && typeof fp.allowsFeature==='function') return fp.allowsFeature('microphone');
+  }catch(e){}
+  return true;
+}
+function initMicState(){
+  const ok = window.isSecureContext && navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder && policyAllowsMic();
+  micState = ok ? 'unknown' : 'blocked';
+}
+async function startRec(key){
+  let stream;
+  try{ stream=await navigator.mediaDevices.getUserMedia({audio:true}); }
+  catch(e){
+    micState='blocked'; renderAll();
+    toast(e && e.name==='NotAllowedError' ? 'マイクが許可されませんでした。ブラウザの設定で許可するか、「ファイルを選ぶ」で音声ファイルを選んでください。' : 'この画面ではマイクが使えません。「ファイルを選ぶ」で音声ファイルを選んでください。');
+    return;
+  }
+  micState='ok';
+  const mime=['audio/webm;codecs=opus','audio/mp4','audio/webm','audio/ogg;codecs=opus'].find(t=>{try{return MediaRecorder.isTypeSupported(t);}catch(e){return false;}})||'';
+  let mr;
+  try{ mr = mime ? new MediaRecorder(stream,{mimeType:mime}) : new MediaRecorder(stream); }
+  catch(e){ stream.getTracks().forEach(t=>t.stop()); toast('録音を始められませんでした。'); return; }
+  const chunks=[], t0=Date.now();
+  mr.ondataavailable=ev=>{ if(ev.data&&ev.data.size) chunks.push(ev.data); };
+  mr.onstop=async ()=>{
+    stream.getTracks().forEach(t=>t.stop());
+    if(rec) clearTimeout(rec.timer);
+    rec=null;
+    const type=mr.mimeType||mime||'audio/webm';
+    const buf=await new Blob(chunks,{type}).arrayBuffer();
+    if(buf.byteLength<300){ toast('録音が短すぎたようです。もう一度どうぞ。'); renderCard(); return; }
+    await saveAudio(key, buf, type, (Date.now()-t0)/1000);
+    renderAll();
+  };
+  rec={mr, key, timer:setTimeout(()=>{ if(mr.state!=='inactive') mr.stop(); }, 12000)};
+  mr.start();
+  renderCard();
+}
+function stopRec(){ if(rec && rec.mr.state!=='inactive') rec.mr.stop(); }
+
+async function saveAudio(key, buf, type, dur){
+  const obj={buf, type, dur: dur==null?null:Math.round(dur*10)/10, at:Date.now()};
+  AUDIO.set(key,obj); CONTOUR.delete(key);
+  await idbPut('audio',key,obj);
+}
+function pickFile(key){ const f=$('file-audio'); f.dataset.key=key; f.value=''; f.click(); }
+
+function decodeWith(ctx, buf){
+  return new Promise((res,rej)=>{ const p=ctx.decodeAudioData(buf,res,rej); if(p&&p.then) p.then(res,rej); });
+}
+async function decode16k(buf){
+  let ab=null;
+  const OAC=window.OfflineAudioContext||window.webkitOfflineAudioContext;
+  if(OAC){ try{ ab=await decodeWith(new OAC(1,16000,16000), buf.slice(0)); }catch(e){ ab=null; } }
+  if(!ab){
+    const AC=window.AudioContext||window.webkitAudioContext;
+    const ac=new AC();
+    try{ ab=await decodeWith(ac, buf.slice(0)); } finally { try{ac.close();}catch(e){} }
+  }
+  let x=ab.getChannelData(0), sr=ab.sampleRate;
+  if(sr>16500){
+    const f=Math.round(sr/16000), y=new Float32Array(Math.floor(x.length/f));
+    for(let i=0;i<y.length;i++){ let s=0; for(let j=0;j<f;j++) s+=x[i*f+j]; y[i]=s/f; }
+    x=y; sr=sr/f;
+  }
+  return {data:x, sr};
+}
+function trackPitch(x, sr){
+  const W=Math.round(sr*0.032), hop=Math.round(sr*0.01);
+  const tmin=Math.max(2,Math.floor(sr/500)), tmax=Math.ceil(sr/70);
+  const n=Math.floor((x.length-W-tmax-2)/hop);
+  if(n<=0) return {f:[], dt:hop/sr};
+  const rms=new Float32Array(n); let maxR=0;
+  for(let k=0;k<n;k++){ const s=k*hop; let e=0; for(let i=0;i<W;i++){ const v=x[s+i]; e+=v*v; } rms[k]=Math.sqrt(e/W); if(rms[k]>maxR) maxR=rms[k]; }
+  const d=new Float32Array(tmax+2), f=[];
+  for(let k=0;k<n;k++){
+    if(rms[k]<maxR*0.1 || rms[k]<1e-4){ f.push(null); continue; }
+    const s=k*hop; let run=0; d[0]=1;
+    for(let tau=1;tau<=tmax+1;tau++){
+      let sum=0;
+      for(let i=0;i<W;i++){ const v=x[s+i]-x[s+i+tau]; sum+=v*v; }
+      run+=sum; d[tau]= run>0 ? sum*tau/run : 1;
+    }
+    let best=-1;
+    for(let tau=tmin;tau<=tmax;tau++){
+      if(d[tau]<0.2){ while(tau+1<=tmax && d[tau+1]<d[tau]) tau++; best=tau; break; }
+    }
+    if(best<0){
+      let mv=1e9;
+      for(let tau=tmin;tau<=tmax;tau++){ if(d[tau]<mv){ mv=d[tau]; best=tau; } }
+      if(mv>0.35){ f.push(null); continue; }
+    }
+    let t=best;
+    if(t>tmin && t<tmax){ const a=d[t-1], b=d[t], c=d[t+1], den=a-2*b+c; if(den!==0) t=t+0.5*(a-c)/den; }
+    f.push(sr/t);
+  }
+  return {f, dt:hop/sr};
+}
+function buildContour(tr){
+  const v=tr.f.filter(x=>x);
+  if(v.length<5) return null;
+  const sorted=[...v].sort((a,b)=>a-b), med=sorted[Math.floor(sorted.length/2)];
+  const st=tr.f.map(x=>{
+    if(!x) return null;
+    let s=12*Math.log2(x/med);
+    if(s>8) s-=12; else if(s<-10) s+=12;
+    return (s>9||s<-11)?null:s;
+  });
+  const sm=st.map((s,i)=>{
+    if(s==null) return null;
+    const w=[]; for(let j=i-2;j<=i+2;j++){ if(j>=0&&j<st.length&&st[j]!=null) w.push(st[j]); }
+    w.sort((a,b)=>a-b); return w[Math.floor(w.length/2)];
+  });
+  for(let i=0;i<sm.length;){
+    if(sm[i]==null){ i++; continue; }
+    let j=i; while(j<sm.length && sm[j]!=null) j++;
+    if(j-i<3) for(let k=i;k<j;k++) sm[k]=null;
+    i=j;
+  }
+  const a=sm.findIndex(x=>x!=null); let b=sm.length-1; while(b>=0 && sm[b]==null) b--;
+  if(a<0 || b-a<4) return null;
+  const seg=sm.slice(a,b+1), len=seg.length-1;
+  for(let i=0;i<seg.length;){
+    if(seg[i]!=null){ i++; continue; }
+    let j=i; while(j<seg.length && seg[j]==null) j++;
+    if(j-i<=8 && i>0 && j<seg.length){ const s0=seg[i-1], s1=seg[j]; for(let k=i;k<j;k++) seg[k]=s0+(s1-s0)*(k-i+1)/(j-i+1); }
+    i=j;
+  }
+  const vs=seg.filter(x=>x!=null).sort((p,q)=>p-q);
+  const mid=(vs[Math.floor(vs.length*0.1)]+vs[Math.floor(vs.length*0.9)])/2;
+  for(let k=0;k<seg.length;k++) if(seg[k]!=null) seg[k]-=mid;
+  return {pts: seg.map((s,k)=> s==null ? null : [k/len, s]), dur:(b-a)*tr.dt};
+}
+async function contourOf(key){
+  const a=AUDIO.get(key);
+  if(!a) return null;
+  const hit=CONTOUR.get(key);
+  if(hit && hit.at===a.at) return hit.c;
+  const {data,sr}=await decode16k(a.buf);
+  const c=buildContour(trackPitch(data,sr));
+  if(a.dur==null){ a.dur=Math.round(data.length/sr*10)/10; idbPut('audio',key,a); }
+  CONTOUR.set(key,{at:a.at, c});
+  return c;
+}
+
+function drawGraph(cv, m, s, emptyMsg){
+  const dpr=window.devicePixelRatio||1, W=cv.clientWidth||600, H=cv.clientHeight||190;
+  cv.width=Math.round(W*dpr); cv.height=Math.round(H*dpr);
+  const g=cv.getContext('2d'); g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,W,H);
+  const cs=getComputedStyle(document.documentElement), col=n=>cs.getPropertyValue(n).trim();
+  const padL=30, padR=10, padT=12, padB=22, yMin=-8, yMax=8;
+  const X=t=>padL+t*(W-padL-padR), Y=v=>padT+(yMax-Math.max(yMin,Math.min(yMax,v)))/(yMax-yMin)*(H-padT-padB);
+  g.strokeStyle=col('--line'); g.lineWidth=1;
+  [-6,-3,0,3,6].forEach(v=>{ g.beginPath(); g.moveTo(padL,Y(v)); g.lineTo(W-padR,Y(v)); g.stroke(); });
+  g.fillStyle=col('--muted'); g.font='12px '+col('--font-body'); g.textBaseline='middle';
+  g.textAlign='left'; g.fillText('高',8,Y(6)); g.fillText('低',8,Y(-6));
+  g.textBaseline='alphabetic'; g.fillText('始め',padL,H-5); g.textAlign='right'; g.fillText('終わり',W-padR,H-5);
+  const line=(c,color,w)=>{
+    if(!c) return;
+    g.strokeStyle=color; g.lineWidth=w; g.lineJoin='round'; g.lineCap='round';
+    g.beginPath(); let pen=false;
+    c.pts.forEach(p=>{ if(!p){ pen=false; return; } const x=X(p[0]), y=Y(p[1]); if(!pen){ g.moveTo(x,y); pen=true; } else g.lineTo(x,y); });
+    g.stroke();
+  };
+  line(m, col('--accent'), 4);
+  line(s, col('--self'), 2.5);
+  if(!m && !s && emptyMsg){ g.fillStyle=col('--muted'); g.textAlign='center'; g.font='13px '+col('--font-body'); g.fillText(emptyMsg, W/2, H/2-4); }
+}
+let graphJob=0;
+async function updateGraph(){
+  const cv=$('graph'); if(!cv) return;
+  const job=++graphJob, it=cur(), cmp=STATE.cmp||'word';
+  const mk=keyOf(it.id,cmp), sk=keyOf(it.id,'self');
+  let m=null, s=null, failed=false;
+  try{ m=await contourOf(mk); }catch(e){ failed=true; }
+  try{ s=await contourOf(sk); }catch(e){ failed=true; }
+  if(job!==graphJob) return;
+  const hasM=AUDIO.has(mk), hasS=AUDIO.has(sk);
+  let msg='';
+  if(!hasM && !hasS) msg='お手本と自分の声を録ると、声の高さの線が出ます';
+  else if(!hasM) msg=cmp==='word'?'単語のお手本がまだありません':'句のお手本がまだありません';
+  else if(!hasS) msg='';
+  drawGraph(cv, m, s, msg);
+  const note=$('graph-note');
+  if(note){
+    if(failed) note.textContent='一部の録音から声の高さを取り出せませんでした。静かな場所で、はっきり録り直してください。';
+    else if(hasM && !hasS) note.textContent='緑の線がお手本です。自分の声を録ると青い線が重なります。';
+    else if(hasM && hasS && (!m || !s)) note.textContent='声の高さを読み取れませんでした。少し大きめの声で録り直してください。';
+    else if(hasM && hasS) note.textContent='線の形、とくに下がる場所を見比べます。声の高さは人によって違うので、高さそのものは揃っていなくて構いません。';
+    else note.textContent='';
+  }
+}
+
+function slotRow(id, slot, label, sub){
+  const key=keyOf(id,slot), a=AUDIO.get(key), recNow=rec && rec.key===key;
+  const meta = a ? '録音あり'+(a.dur?'・'+a.dur.toFixed(1)+'秒':'') : '未録音';
+  const recBtn = micState==='blocked'
+    ? '<button class="btn" type="button" data-act="rec" data-slot="'+slot+'">ファイルを選ぶ</button>'
+    : '<button class="btn'+(recNow?' recording':'')+'" type="button" data-act="rec" data-slot="'+slot+'"><span class="dot" aria-hidden="true"></span>'+(recNow?'止める':(a?'録り直す':'録音'))+'</button>';
+  return '<div class="slot"><div class="name">'+label+'<span class="meta">'+esc(sub?sub+'・':'')+meta+'</span></div><div class="ctrls">'+recBtn+
+    '<button class="btn" type="button" data-act="play" data-slot="'+slot+'"><span class="tri" aria-hidden="true"></span>聞く</button>'+
+    (slot!=='anchor'?'<button class="btn" type="button" data-act="play" data-slot="'+slot+'" data-rate="0.6">ゆっくり</button>':'')+
+    '</div></div>';
+}
+function gradePill(g){
+  if(g==='o') return '<span class="pill g-o">〇 言えた</span>';
+  if(g==='s') return '<span class="pill g-s">△ おしい</span>';
+  if(g==='x') return '<span class="pill g-x">× まだ</span>';
+  return '<span class="pill">未練習</span>';
+}
+function fmtDate(t){ const d=new Date(t); return (d.getMonth()+1)+'月'+d.getDate()+'日'; }
+
+function renderNotices(){
+  let h='';
+  if(micState==='blocked') h+='<p class="notice"><strong>この画面ではマイクが使えません。</strong>「録音」の代わりに「ファイルを選ぶ」になっています。スマホのボイスメモなどで録った音声ファイルを選んでください。マイクが使える場所にこのページを置けば、その場で録音できます。</p>';
+  if(!persistent) h+='<p class="notice"><strong>この画面では録音を保存できません。</strong>閉じると消えるので、残したいときは下の「書き出す」を使ってください。</p>';
+  $('notices').innerHTML=h;
+}
+function renderPassage(){
+  $('passage').innerHTML = PASSAGE.map(p=>'<p>'+p.replace(/\{(\w+)\}/g,(m,id)=>{
+    const it=getItem(id); if(!it) return '';
+    const cls=['w']; if(AUDIO.has(keyOf(id,'word'))) cls.push('has'); if(it.grade) cls.push('g-'+it.grade); if(id===STATE.sel) cls.push('sel');
+    return '<button type="button" class="'+cls.join(' ')+'" data-act="sel" data-id="'+id+'" aria-label="'+esc(it.text)+'を練習する">'+esc(it.text)+'</button>';
+  })+'</p>').join('');
+}
+function renderCard(){
+  const it=cur(), mor=morae(it.reading), n=mor.length, id=it.id;
+  const hasAnchor = AUDIO.has(keyOf(id,'anchor'));
+  let h='';
+  h+='<div class="card-head"><div><p class="eyebrow">いま練習している語</p><p class="word">'+esc(it.text)+'</p></div><div>'+gradePill(it.grade)+'</div></div>';
+  h+='<div class="fields"><label class="f" for="f-reading">読み<input type="text" id="f-reading" value="'+esc(it.reading)+'" autocomplete="off"></label>'+
+     '<label class="f" for="f-phrase">句（本文での言い方）<input type="text" id="f-phrase" value="'+esc(it.phrase)+'" autocomplete="off"></label></div>';
+
+  h+='<div><h3><span class="no">一</span>お手本を吹き込む</h3><p class="hint">指導する人が、単語だけと句まるごとを吹き込みます。すでに正しく言える同じ形の言葉（手がかり語）があれば、それも入れます。</p><div class="slots">'+
+     slotRow(id,'word','単語のお手本', it.text)+
+     slotRow(id,'phrase','句のお手本', it.phrase)+
+     '<div class="slot"><div class="name">手がかり語<span class="meta">'+(hasAnchor?'録音あり':'未録音')+'</span></div><div class="ctrls"><input type="text" id="f-anchor" value="'+esc(it.anchor)+'" placeholder="関西" style="max-width:9em" aria-label="手がかり語">'+
+       (micState==='blocked'?'<button class="btn" type="button" data-act="rec" data-slot="anchor">ファイルを選ぶ</button>':'<button class="btn'+(rec&&rec.key===keyOf(id,'anchor')?' recording':'')+'" type="button" data-act="rec" data-slot="anchor"><span class="dot" aria-hidden="true"></span>'+(rec&&rec.key===keyOf(id,'anchor')?'止める':(hasAnchor?'録り直す':'録音'))+'</button>')+
+       '<button class="btn" type="button" data-act="play" data-slot="anchor"><span class="tri" aria-hidden="true"></span>聞く</button></div></div>'+
+     '</div></div>';
+
+  h+='<div class="pattern"><h3><span class="no">二</span>形を付ける</h3><p class="hint">お手本を聞きながら、下がる直前の音（いちばん高い音）をタップします。最後まで下がらないなら「平板」。</p>'+
+     patternSVG(mor,it.drop)+
+     '<div class="mora-row">'+mor.map((m,i)=>'<button type="button" class="mora'+(it.drop===i+1?' on':'')+'" data-act="drop" data-d="'+(i+1)+'" aria-label="'+esc(m)+'のあとで下がる">'+esc(m)+'</button>').join('')+
+       '<button type="button" class="btn small'+(it.drop===0?' primary':'')+'" data-act="drop" data-d="0">平板</button><button type="button" class="btn small" data-act="drop" data-d="none">形を消す</button></div>'+
+     '<p class="typename">いまの形：<b>'+typeName(it.drop,n)+'</b></p>'+
+     (it.example?'<p class="example">例として、「関西と同じ」をもとに頭高型にしてあります。お手本と違えば付け直してください。</p>':'')+
+     '</div>';
+
+  const an = it.anchor ? '「'+esc(it.anchor)+'」' : '手がかり語';
+  h+='<div><h3><span class="no">三</span>段階を追って言う</h3><p class="hint">上から順に、聞いてはまねます。各段のあと、下の「自分の声」で録って比べると、どこで崩れるかが分かります。</p><ol class="steps">'+
+     '<li><span class="step-no">1</span><div><p class="step-t">メロディだけ</p><p class="step-d">口を閉じて「ンー」でまねます。言葉の音がないぶん、高さだけに集中できます。手を高い位置から下ろしながらでも。</p><div class="ctrls"><button class="btn" type="button" data-act="hum"><span class="tri" aria-hidden="true"></span>ハミング</button><button class="btn" type="button" data-act="hum" data-slow="1">ゆっくり</button></div></div></li>'+
+     '<li><span class="step-no">2</span><div><p class="step-t">手がかり語から移す</p><p class="step-d">言える言葉を先に言い、同じ形のまま本番の語へ移ります。'+an+'→「'+esc(it.text)+'」。</p><div class="ctrls"><button class="btn" type="button" data-act="chain-anchor"><span class="tri" aria-hidden="true"></span>'+an+'→お手本</button></div></div></li>'+
+     '<li><span class="step-no">3</span><div><p class="step-t">ゆっくり、大げさに</p><p class="step-d">一音ずつ伸ばし、下がる場所を大げさに落とします。</p><div class="ctrls"><button class="btn" type="button" data-act="play" data-slot="word" data-rate="0.6"><span class="tri" aria-hidden="true"></span>お手本をゆっくり</button></div></div></li>'+
+     '<li><span class="step-no">4</span><div><p class="step-t">ふつうの速さで</p><p class="step-d">大げさにしたまま、速さだけ戻します。</p><div class="ctrls"><button class="btn" type="button" data-act="play" data-slot="word"><span class="tri" aria-hidden="true"></span>お手本</button></div></div></li>'+
+     '<li><span class="step-no">5</span><div><p class="step-t">句の中で</p><p class="step-d">「'+esc(it.phrase||it.text)+'」と流れの中で言います。崩れたら4に戻ります。</p><div class="ctrls"><button class="btn" type="button" data-act="play" data-slot="phrase"><span class="tri" aria-hidden="true"></span>句のお手本</button><button class="btn" type="button" data-act="play" data-slot="phrase" data-rate="0.6">ゆっくり</button></div></div></li>'+
+     '</ol></div>';
+
+  const sk=keyOf(id,'self'), recSelf=rec&&rec.key===sk, hasSelf=AUDIO.has(sk);
+  h+='<div><h3><span class="no">四</span>自分の声と比べる</h3>'+
+     '<div class="ctrls" style="margin-bottom:10px">'+
+       (micState==='blocked'?'<button class="btn primary" type="button" data-act="rec" data-slot="self">ファイルを選ぶ</button>':'<button class="btn primary'+(recSelf?' recording':'')+'" type="button" data-act="rec" data-slot="self"><span class="dot" aria-hidden="true"></span>'+(recSelf?'止める':(hasSelf?'録り直す':'自分の声を録る'))+'</button>')+
+       '<button class="btn" type="button" data-act="play" data-slot="self"><span class="tri" aria-hidden="true"></span>自分</button>'+
+       '<button class="btn" type="button" data-act="alt"><span class="tri" aria-hidden="true"></span>お手本→自分</button>'+
+     '</div>'+
+     '<div class="ctrls" style="margin-bottom:8px"><span class="eyebrow">比べる相手</span><span class="seg" role="radiogroup" aria-label="比べる相手">'+
+       '<label><input type="radio" name="cmp" value="word"'+(STATE.cmp!=='phrase'?' checked':'')+'>単語</label>'+
+       '<label><input type="radio" name="cmp" value="phrase"'+(STATE.cmp==='phrase'?' checked':'')+'>句</label></span></div>'+
+     '<div class="graph"><canvas id="graph" aria-label="お手本と自分の声の高さの線"></canvas><div class="glegend"><span style="--c:var(--accent)">お手本</span><span style="--c:var(--self)">自分</span></div></div>'+
+     '<p class="hint" id="graph-note" style="margin-top:8px"></p></div>';
+
+  h+='<div><h3><span class="no">五</span>今日の手応え</h3><div class="grades">'+
+     '<button type="button" class="btn g-o'+(it.grade==='o'?' on':'')+'" data-act="grade" data-g="o">〇 言えた</button>'+
+     '<button type="button" class="btn g-s'+(it.grade==='s'?' on':'')+'" data-act="grade" data-g="s">△ おしい</button>'+
+     '<button type="button" class="btn g-x'+(it.grade==='x'?' on':'')+'" data-act="grade" data-g="x">× まだ</button></div>'+
+     (it.gradedAt?'<p class="hint" style="margin-top:6px">最後に付けた日：'+fmtDate(it.gradedAt)+'</p>':'')+'</div>';
+
+  $('card').innerHTML=h;
+  updateGraph();
+}
+function renderList(){
+  const ids=[...ITEMS.map(x=>x[0]), ...STATE.custom.map(c=>c.id)].filter(id=>STATE.items[id]);
+  const order={x:0,s:1,o:3};
+  ids.sort((a,b)=>{
+    const A=getItem(a), B=getItem(b);
+    const ga=A.grade?order[A.grade]:2, gb=B.grade?order[B.grade]:2;
+    if(ga!==gb) return ga-gb;
+    return (AUDIO.has(keyOf(b,'word'))?1:0)-(AUDIO.has(keyOf(a,'word'))?1:0);
+  });
+  if(!ids.length){ $('list').innerHTML='<p class="empty">本文の語をタップすると、ここに加わります。</p>'; return; }
+  $('list').innerHTML=ids.map(id=>{
+    const it=getItem(id);
+    return '<button type="button" class="row'+(id===STATE.sel?' sel':'')+'" data-act="sel" data-id="'+id+'"><span class="rw">'+esc(it.text)+'</span><span class="rr">'+esc(it.reading)+'・'+typeName(it.drop,morae(it.reading).length)+'</span><span class="pills">'+
+      (AUDIO.has(keyOf(id,'word'))?'<span class="pill rec">お手本あり</span>':'')+gradePill(it.grade)+'</span></button>';
+  }).join('');
+}
+function renderData(){
+  const n=AUDIO.size;
+  $('storage-status').textContent = persistent
+    ? 'このブラウザの中に保存しています（録音 '+n+' 件）。ほかの端末には届かず、ブラウザのデータを消すと消えます。'
+    : 'いまは保存できない状態です（録音 '+n+' 件）。閉じる前に書き出してください。';
+}
+function renderAll(){ renderNotices(); renderPassage(); renderCard(); renderList(); renderData(); }
+
+function select(id){
+  if(!getItem(id)) return;
+  STATE.sel=id;
+  if(!STATE.items[id]) STATE.items[id]={};
+  saveState(); renderAll();
+  const reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  $('card-sec').scrollIntoView({behavior:reduce?'auto':'smooth', block:'start'});
+}
+const MISSING={word:'単語のお手本がまだありません。「一 お手本を吹き込む」で録音してください。', phrase:'句のお手本がまだありません。「一 お手本を吹き込む」で録音してください。', anchor:'手がかり語の録音がまだありません。', self:'自分の声がまだありません。「自分の声を録る」を押してください。'};
+
+document.addEventListener('click', e=>{
+  const b=e.target.closest('[data-act]'); if(!b) return;
+  const act=b.dataset.act, it=cur(), id=it.id;
+  if(act==='sel'){ select(b.dataset.id); return; }
+  if(act==='rec'){
+    const key=keyOf(id,b.dataset.slot);
+    if(rec){ stopRec(); return; }
+    if(micState==='blocked'){ pickFile(key); return; }
+    startRec(key); return;
+  }
+  if(act==='play'){
+    const slot=b.dataset.slot, key=keyOf(id,slot);
+    if(!AUDIO.has(key)){ toast(MISSING[slot]); return; }
+    playKey(key, parseFloat(b.dataset.rate||'1')); return;
+  }
+  if(act==='hum'){
+    if(it.drop===null){ toast('先に「二 形を付ける」で、下がる直前の音をタップしてください。'); return; }
+    hum(it.drop, morae(it.reading).length, b.dataset.slow==='1'); return;
+  }
+  if(act==='chain-anchor'){
+    const ak=keyOf(id,'anchor'), wk=keyOf(id,'word');
+    if(!AUDIO.has(wk)){ toast(MISSING.word); return; }
+    if(!AUDIO.has(ak)){ toast((it.anchor?'「'+it.anchor+'」':'手がかり語')+'の録音がないので、自分で言ってからお手本を聞いてください。'); playKey(wk,1); return; }
+    chain([ak,wk],450); return;
+  }
+  if(act==='alt'){
+    const mk=keyOf(id,STATE.cmp||'word'), sk=keyOf(id,'self');
+    if(!AUDIO.has(mk)){ toast(MISSING[STATE.cmp||'word']); return; }
+    if(!AUDIO.has(sk)){ toast(MISSING.self); return; }
+    chain([mk,sk],500); return;
+  }
+  if(act==='drop'){
+    const v=b.dataset.d; setItem(id,{drop: v==='none'?null:parseInt(v,10), example:false}); renderAll(); return;
+  }
+  if(act==='grade'){
+    setItem(id,{grade:b.dataset.g, gradedAt:Date.now()}); renderAll();
+    toast(b.dataset.g==='o'?'記録しました。次の日にもう一度言えるか確かめると確実です。':'記録しました。「練習中の語」の上のほうに並びます。');
+    return;
+  }
+  if(act==='export'){ doExport(); return; }
+  if(act==='import'){ const f=$('file-import'); f.value=''; f.click(); return; }
+});
+document.addEventListener('change', e=>{
+  const t=e.target, id=cur().id;
+  if(t.id==='f-reading'){
+    const v=t.value.trim();
+    if(!/^[ぁ-ゖァ-ヺー]+$/.test(v)){ toast('読みはひらがなかカタカナで入れてください。'); t.value=cur().reading; return; }
+    const n=morae(v).length, d=cur().drop;
+    setItem(id,{reading:v, drop:(d!==null&&d>n)?null:d}); renderAll(); return;
+  }
+  if(t.id==='f-phrase'){ setItem(id,{phrase:t.value.trim()}); renderAll(); return; }
+  if(t.id==='f-anchor'){ setItem(id,{anchor:t.value.trim()}); renderCard(); return; }
+  if(t.name==='cmp'){ STATE.cmp=t.value; saveState(); updateGraph(); return; }
+});
+$('file-audio').addEventListener('change', async e=>{
+  const f=e.target.files&&e.target.files[0], key=e.target.dataset.key;
+  if(!f||!key) return;
+  try{
+    const buf=await f.arrayBuffer();
+    await decode16k(buf);
+    await saveAudio(key, buf, f.type||'audio/mp4', null);
+    renderAll(); toast('音声ファイルを入れました。');
+  }catch(err){ toast('この音声ファイルは読み込めませんでした。別の形式（m4a や mp3）で試してください。'); }
+});
+$('add-form').addEventListener('submit', e=>{
+  e.preventDefault();
+  const text=$('a-text').value.trim(), reading=$('a-reading').value.trim(), err=$('a-err');
+  if(!text){ err.textContent='語か句を入れてください。'; return; }
+  if(!/^[ぁ-ゖァ-ヺー]+$/.test(reading)){ err.textContent='読みをひらがなで入れてください。'; return; }
+  err.textContent='';
+  const id='c'+Date.now().toString(36);
+  STATE.custom.push({id,text,reading,phrase:text});
+  STATE.items[id]={};
+  $('a-text').value=''; $('a-reading').value='';
+  saveState(); select(id);
+});
+['a-text','a-reading'].forEach(i=>$(i).addEventListener('input',()=>{ $('a-err').textContent=''; }));
+
+function abToB64(buf){ const u=new Uint8Array(buf); let s=''; for(let i=0;i<u.length;i+=0x8000) s+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000)); return btoa(s); }
+function b64ToAb(b){ const s=atob(b), u=new Uint8Array(s.length); for(let i=0;i<s.length;i++) u[i]=s.charCodeAt(i); return u.buffer; }
+function ymd(){ const d=new Date(); return d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0'); }
+async function doExport(){
+  let json, filename='uirou-keiko-'+ymd()+'.json';
+  try{
+    const audio={}; AUDIO.forEach((a,k)=>{ audio[k]={type:a.type, dur:a.dur, at:a.at, b64:abToB64(a.buf)}; });
+    json=JSON.stringify({app:'uirou-keiko', v:1, exportedAt:new Date().toISOString(), state:STATE, audio});
+  }catch(e){ toast('書き出せませんでした。'); return; }
+  if(window.claude && typeof window.claude.use==='function'){
+    let dl=null;
+    try{ dl=await window.claude.use('downloads'); }catch(e){ dl=null; }
+    if(dl){
+      try{ await dl.save({filename, data:json}); toast('書き出しました（録音 '+AUDIO.size+' 件）。'); }
+      catch(err){ toast(err && err.code==='declined' ? '書き出しを取りやめました。' : 'この画面では書き出せませんでした。'); }
+      return;
+    }
+  }
+  try{
+    const url=URL.createObjectURL(new Blob([json],{type:'application/json'}));
+    const a=document.createElement('a'); a.href=url; a.download=filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),5000);
+    toast('書き出しました（録音 '+AUDIO.size+' 件）。');
+  }catch(e){ toast('書き出せませんでした。'); }
+}
+$('file-import').addEventListener('change', async e=>{
+  const f=e.target.files&&e.target.files[0]; if(!f) return;
+  try{
+    const data=JSON.parse(await f.text());
+    if(!data||data.app!=='uirou-keiko') throw new Error('format');
+    const s=data.state||{};
+    Object.entries(s.items||{}).forEach(([id,v])=>{ STATE.items[id]=Object.assign({}, STATE.items[id]||{}, v); });
+    (s.custom||[]).forEach(c=>{ if(!STATE.custom.find(x=>x.id===c.id)) STATE.custom.push(c); });
+    let n=0;
+    for(const [k,a] of Object.entries(data.audio||{})){
+      const obj={buf:b64ToAb(a.b64), type:a.type, dur:a.dur??null, at:a.at||Date.now()};
+      AUDIO.set(k,obj); CONTOUR.delete(k); await idbPut('audio',k,obj); n++;
+    }
+    saveState(); renderAll(); toast('読み込みました（録音 '+n+' 件）。');
+  }catch(err){ toast('このファイルは読み込めませんでした。稽古帳から書き出した .json ファイルを選んでください。'); }
+});
+
+window.addEventListener('resize', ()=>{ clearTimeout(window.__rz); window.__rz=setTimeout(updateGraph,150); });
+window.__keiko={saveAudio, trackPitch, buildContour, renderAll, AUDIO};
+
+initMicState();
+renderAll();
+(async ()=>{
+  try{ db=await idbOpen(); persistent=true; }catch(e){ db=null; persistent=false; }
+  try{ const s=await idbGet('kv','state'); if(s && s.items){ STATE=Object.assign(defaultState(), s); } }catch(e){}
+  try{ await loadAllAudio(); }catch(e){}
+  renderAll();
+})();
+</script>
+</body>
+</html>
